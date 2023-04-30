@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfTypeDate xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <TypeDate>
+    <guid>1a4b54cae68d68f4293a64f968e40310</guid>
+    <fileName>Assets/Plugins/UnitySweeper/Editor/AssetCollector.cs</fileName>
+    <timeStamp>2023-04-30T22:44:57+01:00</timeStamp>
+    <typeFullName />
+  </TypeDate>
+  <TypeDate>
+    <guid>7f8e6ebd4fc368f4f8bc9b01089cf27c</guid>
+    <fileName>Assets/Plugins/UnitySweeper/Editor/AssetReferenceCollection.cs</fileName>
+    <timeStamp>2023-04-30T22:44:57+01:00</timeStamp>
+    <typeFullName />
+  </TypeDate>
+  <TypeDate>
+    <guid>01d85f52c1f3b1847980ab5f729fd280</guid>
+    <fileName>Assets/Plugins/UnitySweeper/Editor/ClassReferenceCollection.cs</fileName>
+    <timeStamp>2023-04-30T22:44:57+01:00</timeStamp>
+    <typeFullName />
+  </TypeDate>
+  <TypeDate>
+    <guid>0e5b2fe1cc9cf7b4fa13f76a13a9e3de</guid>
+    <fileName>Assets/Plugins/UnitySweeper/Editor/CollectionData.cs</fileName>
+    <timeStamp>2023-04-30T22:44:57+01:00</timeStamp>
+    <typeFullName />
+  </TypeDate>
+  <TypeDate>
+    <guid>ca4169b07e63bce4a88d8bc6041375fa</guid>
+    <fileName>Assets/Plugins/UnitySweeper/Editor/FindUnusedAssetsWindow.cs</fileName>
+    <timeStamp>2023-04-30T22:44:57+01:00</timeStamp>
+    <typeFullName />
+  </TypeDate>
+  <TypeDate>
+    <guid>ba30ed8d4bc798546adbd32f9330ec02</guid>
+    <fileName>Assets/Plugins/UnitySweeper/Editor/ShaderReferenceCollection.cs</fileName>
+    <timeStamp>2023-04-30T22:44:57+01:00</timeStamp>
+    <typeFullName />
+  </TypeDate>
+  <TypeDate>
+    <guid>ef519bec2023fb1478d699bdc44c392d</guid>
+    <fileName>Assets/scripts/CustomizationMenuManager.cs</fileName>
+    <timeStamp>2023-04-30T17:29:10.0935525+01:00</timeStamp>
+    <typeFullName>
+      <string>CustomizationMenuManager</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>2e27858cb269bed41b5d062701b08708</guid>
+    <fileName>Assets/scripts/GroundGenerator.cs</fileName>
+    <timeStamp>2023-04-30T21:54:59.7330043+01:00</timeStamp>
+    <typeFullName>
+      <string>GroundGenerator</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>b337cb160ed209247a0454deba6d0154</guid>
+    <fileName>Assets/scripts/IRPlayer.cs</fileName>
+    <timeStamp>2023-04-30T20:19:11.0113425+01:00</timeStamp>
+    <typeFullName>
+      <string>IRPlayer</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>7fc518046553afa41a735abaf0d65753</guid>
+    <fileName>Assets/scripts/MainMenuManager.cs</fileName>
+    <timeStamp>2023-04-30T00:19:27.9465308+01:00</timeStamp>
+    <typeFullName>
+      <string>MainMenuManager</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>6e3197df39c2b2a41a1e7c1769d8f5c1</guid>
+    <fileName>Assets/scripts/PlatformTile.cs</fileName>
+    <timeStamp>2023-04-30T20:19:06.2327412+01:00</timeStamp>
+    <typeFullName>
+      <string>PlatformTile</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>21cff4bd1954806419e88da6c8e7222d</guid>
+    <fileName>Assets/scripts/SettingsMenuManager.cs</fileName>
+    <timeStamp>2023-04-30T20:19:00.6332364+01:00</timeStamp>
+    <typeFullName>
+      <string>SettingsMenuManager</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>ffe04ecf2f96f9c45bab5a2f39e0d8c9</guid>
+    <fileName>Assets/FlexibleColorPicker/ExampleScene/FCP_ExampleScript.cs</fileName>
+    <timeStamp>2022-06-03T20:04:03+01:00</timeStamp>
+    <typeFullName>
+      <string>FCP_ExampleScript</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>7da1b0489b84d12469f154b8cd52049c</guid>
+    <fileName>Assets/FlexibleColorPicker/Scripts/FCP_Persistence.cs</fileName>
+    <timeStamp>2022-06-03T20:03:53+01:00</timeStamp>
+    <typeFullName>
+      <string>FCP_Persistence</string>
+      <string>FCP_Persistence+SaveStrategy</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>7ea7ea40fb6ab6048a5f962e5dab4e5d</guid>
+    <fileName>Assets/FlexibleColorPicker/Scripts/FCP_SpriteMeshEditor.cs</fileName>
+    <timeStamp>2022-06-03T20:03:54+01:00</timeStamp>
+    <typeFullName>
+      <string>FCP_SpriteMeshEditor</string>
+      <string>FCP_SpriteMeshEditor+MeshType</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>31629c56f6f83234a90f6296f902f9c0</guid>
+    <fileName>Assets/FlexibleColorPicker/Scripts/FlexibleColorPicker.cs</fileName>
+    <timeStamp>2022-06-03T20:03:48+01:00</timeStamp>
+    <typeFullName>
+      <string>FlexibleColorPicker</string>
+      <string>FlexibleColorPicker+MainPickingMode</string>
+      <string>FlexibleColorPicker+ColorUpdateEvent</string>
+      <string>FlexibleColorPicker+AdvancedSettings</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>571045d48cec88d48848f53bf379f673</guid>
+    <fileName>Assets/FreeDraw/Scripts/Drawable.cs</fileName>
+    <timeStamp>2023-04-30T16:40:12.6339033+01:00</timeStamp>
+    <typeFullName>
+      <string>FreeDraw.Drawable</string>
+      <string>FreeDraw.Drawable+Brush_Function</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>03510ea897333a3478c3615be62b832e</guid>
+    <fileName>Assets/FreeDraw/Scripts/DrawingSettings.cs</fileName>
+    <timeStamp>2023-04-30T20:18:49.7939058+01:00</timeStamp>
+    <typeFullName>
+      <string>FreeDraw.DrawingSettings</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>9c509d5af9531db48bceddee41a13154</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/Aimer.cs</fileName>
+    <timeStamp>2021-09-13T10:24:36+01:00</timeStamp>
+    <typeFullName>
+      <string>Aimer</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>015bfc21da67df14397ea90e232e9f52</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/CharacterMovement.cs</fileName>
+    <timeStamp>2021-09-13T10:21:49+01:00</timeStamp>
+    <typeFullName>
+      <string>CharacterMovement</string>
+      <string>CharacterMovement+InputButtonType</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>bc01396e53d1bb147ae46ef0ba344496</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/CharacterMovementAnimator.cs</fileName>
+    <timeStamp>2021-09-13T10:25:14+01:00</timeStamp>
+    <typeFullName>
+      <string>CharacterMovementAnimator</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>e9268b67cb4367d4187f2e173634bd22</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/CharacterStanceAnimator.cs</fileName>
+    <timeStamp>2021-09-13T10:25:56+01:00</timeStamp>
+    <typeFullName>
+      <string>CharacterStanceAnimator</string>
+      <string>CharacterStanceAnimator+StanceState</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>730a2518e0da5fb48a71e1d15c46439b</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/CharacterWeaponAnimator.cs</fileName>
+    <timeStamp>2021-09-13T10:23:48+01:00</timeStamp>
+    <typeFullName>
+      <string>CharacterWeaponAnimator</string>
+      <string>CharacterWeaponAnimator+AimMode</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>49e2e99df24f6ca4d886612012190511</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/Croucher.cs</fileName>
+    <timeStamp>2021-09-13T10:23:07+01:00</timeStamp>
+    <typeFullName>
+      <string>Croucher</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>24ff2c575df4dc446917e4dca941d6c5</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/DeadStateController.cs</fileName>
+    <timeStamp>2021-09-13T10:22:27+01:00</timeStamp>
+    <typeFullName>
+      <string>DeadStateController</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>2adc6963a3994b3418907a39128239b4</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/DirectAimController.cs</fileName>
+    <timeStamp>2021-09-13T10:22:32+01:00</timeStamp>
+    <typeFullName>
+      <string>DirectAimController</string>
+      <string>DirectAimController+InputButtonType</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>de8f4937f1bb358449b5cf541b4ea8e2</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/RelativeAimController.cs</fileName>
+    <timeStamp>2021-09-13T10:25:45+01:00</timeStamp>
+    <typeFullName>
+      <string>RelativeAimController</string>
+      <string>RelativeAimController+InputButtonType</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>8dafca7200a8c15408ad1fcd81578235</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/Strafer.cs</fileName>
+    <timeStamp>2021-09-13T10:24:21+01:00</timeStamp>
+    <typeFullName>
+      <string>Strafer</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>85d00d05aa4b1ef469f6cfb02c3147e2</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/ZombieHitting.cs</fileName>
+    <timeStamp>2021-09-13T10:24:11+01:00</timeStamp>
+    <typeFullName>
+      <string>ZombieHitting</string>
+      <string>ZombieHitting+InputButtonType</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>f7fb323adcab4c14bb303bc89320ac05</guid>
+    <fileName>Assets/Supercyan/Scripts/AimingAssets/ZombieStateController.cs</fileName>
+    <timeStamp>2021-09-13T10:26:13+01:00</timeStamp>
+    <typeFullName>
+      <string>ZombieStateController</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>2b42eeac55dedc444aad3cc1953aabf1</guid>
+    <fileName>Assets/Supercyan/Scripts/CharacterMaker/AimPoint.cs</fileName>
+    <timeStamp>2021-09-13T10:22:34+01:00</timeStamp>
+    <typeFullName>
+      <string>AimPoint</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>54362ffe0e21a5d4a9e425f34380e935</guid>
+    <fileName>Assets/Supercyan/Scripts/CharacterMaker/CharacterAppearanceObject.cs</fileName>
+    <timeStamp>2021-09-13T10:23:16+01:00</timeStamp>
+    <typeFullName>
+      <string>CharacterAppearanceObject</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>fe4d3b7fd573b9a40b797b0882cf8974</guid>
+    <fileName>Assets/Supercyan/Scripts/CharacterMaker/CharacterBehaviorObject.cs</fileName>
+    <timeStamp>2021-09-13T10:26:18+01:00</timeStamp>
+    <typeFullName>
+      <string>CharacterBehaviorObject</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>52876ff7f868cec4dabcb91e45698c7c</guid>
+    <fileName>Assets/Supercyan/Scripts/CharacterMaker/CharacterMakerWizard.cs</fileName>
+    <timeStamp>2021-09-13T10:23:14+01:00</timeStamp>
+    <typeFullName>
+      <string>CharacterMakerWizard</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>5130e8dcfa13eb342a0edc8d2ef497fc</guid>
+    <fileName>Assets/Supercyan/Scripts/CharacterMaker/Hand.cs</fileName>
+    <timeStamp>2021-09-13T10:23:13+01:00</timeStamp>
+    <typeFullName>
+      <string>Hand</string>
+      <string>Hand+HandSide</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>3ed5a8f1dcf90bc41bf502fab56a3b73</guid>
+    <fileName>Assets/Supercyan/Scripts/CharacterMaker/IInitializable.cs</fileName>
+    <timeStamp>2021-09-13T10:22:58+01:00</timeStamp>
+    <typeFullName>
+      <string>IInitializable</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>687b6426f704a644d8727ee8b434819e</guid>
+    <fileName>Assets/Supercyan/Scripts/CommonCharacterAssets/SimpleCharacterControl.cs</fileName>
+    <timeStamp>2021-09-13T10:23:33+01:00</timeStamp>
+    <typeFullName>
+      <string>SimpleCharacterControl</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>5370bddcf9fed824aa8f1851c7243647</guid>
+    <fileName>Assets/Supercyan/Scripts/DemoAssets/CameraLogic.cs</fileName>
+    <timeStamp>2021-09-13T10:23:14+01:00</timeStamp>
+    <typeFullName>
+      <string>CameraLogic</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>652a0e8cf03b3d9489c4dac73b3af013</guid>
+    <fileName>Assets/Supercyan/Scripts/DemoAssets/CharacterDemoSettings.cs</fileName>
+    <timeStamp>2021-09-13T10:23:31+01:00</timeStamp>
+    <typeFullName>
+      <string>CharacterDemoSettings</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>e0478cc3dc797aa479790ed461566ae8</guid>
+    <fileName>Assets/Supercyan/Scripts/DemoAssets/Demo.cs</fileName>
+    <timeStamp>2021-09-13T10:25:47+01:00</timeStamp>
+    <typeFullName>
+      <string>Demo</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>7562a62f21fde0f48b9a26ac93d003ea</guid>
+    <fileName>Assets/Supercyan/Scripts/DemoAssets/DemoCameraLogic.cs</fileName>
+    <timeStamp>2021-09-13T10:23:50+01:00</timeStamp>
+    <typeFullName>
+      <string>DemoCameraLogic</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>4c2d8002cc9c4814a9c6b16452aeabfb</guid>
+    <fileName>Assets/Supercyan/Scripts/DemoAssets/DemoControls.cs</fileName>
+    <timeStamp>2021-09-13T10:23:09+01:00</timeStamp>
+    <typeFullName>
+      <string>DemoControls</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>82cda168850797c49ab097b140a51530</guid>
+    <fileName>Assets/Supercyan/Scripts/DemoAssets/DemoUI.cs</fileName>
+    <timeStamp>2021-09-13T10:24:08+01:00</timeStamp>
+    <typeFullName>
+      <string>DemoUI</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>0cd8e3aee3726714e971999bc0e8b7f0</guid>
+    <fileName>Assets/Supercyan/Scripts/DemoAssets/ThirdPersonCamera.cs</fileName>
+    <timeStamp>2021-09-13T10:22:02+01:00</timeStamp>
+    <typeFullName>
+      <string>ThirdPersonCamera</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>255aaee41d432b44db26cb861cfbb389</guid>
+    <fileName>Assets/Supercyan/Scripts/ItemAssets/AccessoryWearLogic.cs</fileName>
+    <timeStamp>2021-09-13T10:22:27+01:00</timeStamp>
+    <typeFullName>
+      <string>AccessoryWearLogic</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>9ae7d10e93f11944bba09a653fa448ab</guid>
+    <fileName>Assets/Supercyan/Scripts/ItemAssets/AnimationSetBool.cs</fileName>
+    <timeStamp>2021-09-13T10:24:34+01:00</timeStamp>
+    <typeFullName>
+      <string>AnimationSetBool</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>3b3cf3482b0c30a4b8f17c3fde5e8d5d</guid>
+    <fileName>Assets/Supercyan/Scripts/ItemAssets/AnimatorOverridesApplier.cs</fileName>
+    <timeStamp>2021-09-13T10:22:53+01:00</timeStamp>
+    <typeFullName>
+      <string>AnimatorOverridesApplier</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>cea616d0e4f3ca04eb98a3424f41b7a2</guid>
+    <fileName>Assets/Supercyan/Scripts/ItemAssets/CharacterItemAnimator.cs</fileName>
+    <timeStamp>2021-09-13T10:25:29+01:00</timeStamp>
+    <typeFullName>
+      <string>CharacterItemAnimator</string>
+      <string>CharacterItemAnimator+InputButtonType</string>
+      <string>CharacterItemAnimator+Hand</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>71e97cff33055e64e973cf2121c8502b</guid>
+    <fileName>Assets/Supercyan/Scripts/ItemAssets/ItemHoldLogic.cs</fileName>
+    <timeStamp>2021-09-13T10:23:45+01:00</timeStamp>
+    <typeFullName>
+      <string>ItemHoldLogic</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>1e0cf23a81555f64eba5701b362d33cf</guid>
+    <fileName>Assets/Supercyan/Scripts/Items/AccessoryItemLogic.cs</fileName>
+    <timeStamp>2021-09-13T10:22:19+01:00</timeStamp>
+    <typeFullName>
+      <string>AccessoryItemLogic</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>8d967dfa3f5dcc245858efb60b60dd63</guid>
+    <fileName>Assets/Supercyan/Scripts/Items/AccessoryLogic.cs</fileName>
+    <timeStamp>2021-09-13T10:24:20+01:00</timeStamp>
+    <typeFullName>
+      <string>AccessoryLogic</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>5945c72569b9f7b408b73dea863966b8</guid>
+    <fileName>Assets/Supercyan/Scripts/Items/AccessoryObject.cs</fileName>
+    <timeStamp>2021-09-13T10:23:22+01:00</timeStamp>
+    <typeFullName>
+      <string>AccessoryObject</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>018070b8cccb4354b85408e9c10aedee</guid>
+    <fileName>Assets/Supercyan/Scripts/Items/ItemAnimationsObject.cs</fileName>
+    <timeStamp>2021-09-13T10:21:49+01:00</timeStamp>
+    <typeFullName>
+      <string>ItemAnimationsObject</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>b040736da90200d469616062cbbd8ea4</guid>
+    <fileName>Assets/Supercyan/Scripts/Items/ItemLogic.cs</fileName>
+    <timeStamp>2021-09-13T10:25:00+01:00</timeStamp>
+    <typeFullName>
+      <string>ItemLogic</string>
+      <string>ItemLogic+FlipHand</string>
+      <string>ItemLogic+HandPreference</string>
+      <string>ItemLogic+ItemType</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>a0c484ab7f65f4a449a412f4005542d3</guid>
+    <fileName>Assets/Supercyan/Scripts/Items/ItemObject.cs</fileName>
+    <timeStamp>2021-09-13T10:24:40+01:00</timeStamp>
+    <typeFullName>
+      <string>ItemObject</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>d48863a3e3916df408151fabe9130598</guid>
+    <fileName>Assets/Polytope Studio/Lowpoly_Characters/Sources/Scripts/PT_Create_Prefab.cs</fileName>
+    <timeStamp>2023-04-05T15:31:15+01:00</timeStamp>
+    <typeFullName>
+      <string>Polytope.PT_Create_Prefab</string>
+      <string>Polytope.PT_Create_Prefab+PreviewCallback</string>
+      <string>Polytope.PT_Create_Prefab+TypeOfMesh</string>
+      <string>Polytope.PT_Create_Prefab+ShaderProperties_C</string>
+      <string>Polytope.PT_Create_Prefab+ShaderProperties_CI</string>
+      <string>Polytope.PT_Create_Prefab+ShaderProperties_CS</string>
+      <string>Polytope.PT_Create_Prefab+ShaderProperties_CSM</string>
+      <string>Polytope.PT_Create_Prefab+ShaderProperties_CSP</string>
+      <string>Polytope.PT_Create_Prefab+MeshType</string>
+    </typeFullName>
+    <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
+  </TypeDate>
+  <TypeDate>
+    <guid>08d6341968358694e81b5e6a039178b9</guid>
+    <fileName>Assets/Polytope Studio/Lowpoly_Characters/Sources/Scripts/Editor/PT_Create_Prefab_Editor.cs</fileName>
+    <timeStamp>2023-04-05T15:30:37+01:00</timeStamp>
+    <typeFullName />
+  </TypeDate>
+</ArrayOfTypeDate>
