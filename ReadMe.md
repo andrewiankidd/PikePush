@@ -42,5 +42,6 @@ This is basically just a ten minute runner game written in Unity, but with some 
     <a href="https://github.com/andrewiankidd/PikePush">
         <img src="https://img.shields.io/badge/GitHub-cadetblue.svg?logo=gitHub" />
     </a>
+    <br>
     <img src="https://github.com/andrewiankidd/PikePush/raw/master/assets/screencap.gif">
 </p>
