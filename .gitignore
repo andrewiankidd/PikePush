@@ -82,3 +82,4 @@ crashlytics-build.properties
 # !/src/[Aa]ssets/PikePush/**
 # !/src/[Aa]ssets/Editor
 # !/src/[Aa]ssets/Editor/**
+/stdout.log

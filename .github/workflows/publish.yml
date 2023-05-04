@@ -141,8 +141,11 @@ jobs:
 
   build:
     name: Building for ${{ matrix.name }} 🛠️
-    runs-on: windows-2019
-    needs: acquire_ulf
+    runs-on: ubuntu-latest
+    needs: [
+      acquire_ulf,
+      prepare_release
+    ]
     strategy:
       fail-fast: false
       matrix:
@@ -197,7 +200,9 @@ jobs:
         with:
           unityVersion: ${{ env.UNITY_MAJOR_VERSION }}.${{ env.UNITY_MINOR_VERSION }}.${{ env.UNITY_PATCH_VERSION }}
           targetPlatform: ${{ matrix.targetPlatform }}
+          projectPath: src
           buildsPath: Build
+          buildMethod: UnityBuilderAction.Builder.BuildProject
           allowDirtyBuild: true
           
       - name: 🗜️ Compress Release

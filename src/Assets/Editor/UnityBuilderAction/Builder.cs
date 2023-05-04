@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 
 namespace UnityBuilderAction
 {
-    public static class Builder
+    public class Builder
     {
         private static readonly string Eol = Environment.NewLine;
 
@@ -16,6 +15,7 @@ namespace UnityBuilderAction
 
         public static void BuildProject()
         {
+            ConsoleBlock("BuildProject!",  new Dictionary<string, string>(){});
             // Gather values from args
             Dictionary<string, string> options = GetValidatedOptions();
 
@@ -85,6 +85,7 @@ namespace UnityBuilderAction
 
         private static Dictionary<string, string> GetValidatedOptions()
         {
+            ConsoleBlock("GetValidatedOptions!",  new Dictionary<string, string>(){});
             ParseCommandLineArguments(out Dictionary<string, string> validatedOptions);
 
             if (!validatedOptions.TryGetValue("projectPath", out string _))
@@ -123,21 +124,16 @@ namespace UnityBuilderAction
                 validatedOptions.Add("customBuildName", defaultCustomBuildName);
             }
 
+            ConsoleBlock("GetValidatedOptions->return!",  new Dictionary<string, string>(){});
             return validatedOptions;
         }
 
         private static void ParseCommandLineArguments(out Dictionary<string, string> providedArguments)
         {
+            ConsoleBlock("Parsing settings!",  new Dictionary<string, string>(){});
+
             providedArguments = new Dictionary<string, string>();
             string[] args = Environment.GetCommandLineArgs();
-
-            Console.WriteLine(
-                $"{Eol}" +
-                $"###########################{Eol}" +
-                $"#    Parsing settings     #{Eol}" +
-                $"###########################{Eol}" +
-                $"{Eol}"
-            );
 
             // Extract flags with optional values
             for (int current = 0, next = 1; current < args.Length; current++, next++)
@@ -161,7 +157,17 @@ namespace UnityBuilderAction
 
         private static void Build(BuildTarget buildTarget, int buildSubtarget, string filePath)
         {
+            ConsoleBlock("Building!",  new Dictionary<string, string>(){
+                {"BuildTarget", buildTarget.ToString()},
+                {"BuildSubtarget", buildSubtarget.ToString()},
+                {"FilePath", filePath}
+            });
+
             string[] scenes = EditorBuildSettings.scenes.Where(scene => scene.enabled).Select(s => s.path).ToArray();
+            ConsoleBlock("Scenes!",  new Dictionary<string, string>(){
+                {"Scenes", string.Join(",", scenes)}
+            });
+
             var buildPlayerOptions = new BuildPlayerOptions
             {
                 scenes = scenes,
@@ -173,6 +179,9 @@ namespace UnityBuilderAction
                 subtarget = buildSubtarget
 #endif
             };
+            ConsoleBlock("buildPlayerOptions!",  new Dictionary<string, string>(){
+                {"buildPlayerOptions", buildPlayerOptions.ToString()}
+            });
 
             BuildSummary buildSummary = BuildPipeline.BuildPlayer(buildPlayerOptions).summary;
             ReportSummary(buildSummary);
@@ -181,18 +190,12 @@ namespace UnityBuilderAction
 
         private static void ReportSummary(BuildSummary summary)
         {
-            Console.WriteLine(
-                $"{Eol}" +
-                $"###########################{Eol}" +
-                $"#      Build results      #{Eol}" +
-                $"###########################{Eol}" +
-                $"{Eol}" +
-                $"Duration: {summary.totalTime.ToString()}{Eol}" +
-                $"Warnings: {summary.totalWarnings.ToString()}{Eol}" +
-                $"Errors: {summary.totalErrors.ToString()}{Eol}" +
-                $"Size: {summary.totalSize.ToString()} bytes{Eol}" +
-                $"{Eol}"
-            );
+            ConsoleBlock("Build results",  new Dictionary<string, string>(){
+                {"Duration", summary.totalTime.ToString()},
+                {"Warnings", summary.totalWarnings.ToString()},
+                {"Errors", summary.totalErrors.ToString()},
+                {"Size", $"{summary.totalSize.ToString()} bytes"}
+            });
         }
 
         private static void ExitWithResult(BuildResult result)
@@ -217,6 +220,19 @@ namespace UnityBuilderAction
                     EditorApplication.Exit(103);
                     break;
             }
+        }
+
+        private static void ConsoleBlock(string title, Dictionary<string, string> outputs)
+        {
+            Console.WriteLine(
+                $"{Eol}" +
+                $"###########################{Eol}" +
+                $"#          {title}        #{Eol}" +
+                $"###########################{Eol}" +
+                $"{Eol}" +
+                string.Join(Eol, outputs.Select(kvp => string.Format($"{kvp.Key}: {kvp.Value}"))) +
+                $"{Eol}"
+            );
         }
     }
 }
