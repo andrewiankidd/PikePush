@@ -13,10 +13,11 @@ This is basically just a ten minute runner game written in Unity, but with some 
 ### Links
 <p align="center">
     <a href="https://andrewiankidd.github.io/PikePush/">
-        <img src="https://img.shields.io/badge/%E2%9A%94%EF%B8%8F%20PikePush-lightblue.svg" height="50" />
+        <img src="https://img.shields.io/badge/%E2%9A%94%EF%B8%8F%20PikePush-lightblue.svg" height="50" target="_blank" />
     </a>
     <br>
-    <strong>Play:</strong><br>
+    <strong>Play:</strong>
+    <br>
     <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/WebGL-release.zip">
         <img src="https://img.shields.io/badge/%f0%9f%8c%90%20Browser-cadetblue.svg" />
     </a>
@@ -36,9 +37,10 @@ This is basically just a ten minute runner game written in Unity, but with some 
         <img src="https://img.shields.io/badge/iOS-cadetblue.svg?logo=ios" />
     </a>
     <br>
-    <strong>Source Code:</strong><br>
+    <strong>Source Code:</strong>
+    <br>
     <a href="https://github.com/andrewiankidd/PikePush">
         <img src="https://img.shields.io/badge/GitHub-cadetblue.svg?logo=gitHub" />
     </a>
-    <img src="./assets/screencap.gif">
+    <img src="https://github.com/andrewiankidd/PikePush/raw/master/assets/screencap.gif">
 </p>
