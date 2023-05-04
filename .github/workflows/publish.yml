@@ -231,6 +231,10 @@ jobs:
         run: |
           mv WebGL .github/pages
 
+      - name: Debug
+        run: |
+          ls -aR
+
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
