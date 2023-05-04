@@ -223,17 +223,9 @@ jobs:
           latest: true
           extract: true
 
-      - name: Debug
-        run: |
-          ls -aR
-
       - name: Move WebGL
         run: |
           mv WebGL/WebGL .github/pages
-
-      - name: Debug
-        run: |
-          ls -aR
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
