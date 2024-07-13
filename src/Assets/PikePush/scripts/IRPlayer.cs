@@ -1,10 +1,22 @@
+using System;
 using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 
 public class IRPlayer : MonoBehaviour
 {
+
+    [Flags]
+    enum Controls {
+        Idle,
+        Left,
+        Right,
+        Up,
+        Down
+    }
+
     public float gravity = 20.0f;
     public float jumpHeight = 2.5f;
+    public float strafeSpeed = 2.75f;
 
     Rigidbody r;
     bool grounded = false;
@@ -23,37 +35,82 @@ public class IRPlayer : MonoBehaviour
 
     void Update()
     {
-        if (grounded) {
+        #region control checks
+        Controls activeControls = Controls.Idle;
 
-            // jump?
-            if (Input.GetKeyDown(KeyCode.W))
+        if (Input.touchCount > 0) {
+            Touch touch = Input.GetTouch(0);
+
+            if (touch.position.y > (Screen.width/3))
             {
+                activeControls |= Controls.Up;
+            } else if (touch.position.y < (Screen.width/3))
+            {
+                activeControls |= Controls.Down;
+            }
+            if (touch.position.x < (Screen.width/3))
+            {
+                activeControls |= Controls.Left;
+            }
+            else if (touch.position.x > (Screen.width/3))
+            {
+                activeControls |= Controls.Right;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            Debug.Log("[IRPlayer][Update][Controls.Up]");
+            activeControls |= Controls.Up;
+        }
+        else if (Input.GetKey(KeyCode.S))
+        {
+            Debug.Log("[IRPlayer][Update][Controls.Down]");
+            activeControls |= Controls.Down;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            Debug.Log("[IRPlayer][Update][Controls.Left]");
+            activeControls |= Controls.Left;
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            Debug.Log("[IRPlayer][Update][Controls.Right]");
+            activeControls |= Controls.Right;
+        }
+        #endregion
+
+        #region game controls
+        if (grounded) {
+            if (activeControls.HasFlag(Controls.Up))
+            {
+                Debug.Log("[IRPlayer][Update][Jump]");
                 r.velocity = new Vector3(r.velocity.x, CalculateJumpVerticalSpeed(), r.velocity.z);
             }
-
-            // strafe
-            if (Input.GetKey(KeyCode.A) && r.position.x > -2.75f)
+            else if (activeControls.HasFlag(Controls.Down))
             {
-                r.position = new Vector3((r.position.x - (Time.deltaTime * 2.75f)), r.position.y, r.position.z);
+                Debug.Log("[IRPlayer][Update][Crouch]");
+                transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(defaultScale.x, defaultScale.y * 0.4f, defaultScale.z), Time.deltaTime * 7);
             }
-            else if (Input.GetKey(KeyCode.D) && r.position.x < 2.75f)
+            else if (activeControls.HasFlag(Controls.Left) && r.position.x > -strafeSpeed)
             {
-                r.position = new Vector3((r.position.x + (Time.deltaTime * 2.75f)), r.position.y, r.position.z);
+                Debug.Log("[IRPlayer][Update][StrafeLeft]");
+                r.position = new Vector3(r.position.x - (Time.deltaTime * strafeSpeed), r.position.y, r.position.z);
             }
-        }
-        // Jump
-        
+            else if (activeControls.HasFlag(Controls.Right) && r.position.x < strafeSpeed)
+            {
+                Debug.Log("[IRPlayer][Update][StrafeRight]");
+                r.position = new Vector3(r.position.x + (Time.deltaTime * strafeSpeed), r.position.y, r.position.z);
+            }
+            else
+            {
+                // Debug.Log("[IRPlayer][Update][UnCrouch]");
+                transform.localScale = Vector3.Lerp(transform.localScale, defaultScale, Time.deltaTime * 7);
+            }
 
-        //Crouch
-        crouch = Input.GetKey(KeyCode.S);
-        if (crouch)
-        {
-            transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(defaultScale.x, defaultScale.y * 0.4f, defaultScale.z), Time.deltaTime * 7);
         }
-        else
-        {
-            transform.localScale = Vector3.Lerp(transform.localScale, defaultScale, Time.deltaTime * 7);
-        }
+
+        #endregion
     }
 
     // Update is called once per frame
