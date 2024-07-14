@@ -36,33 +36,9 @@ public class IRPlayer : MonoBehaviour
         r.useGravity = false;
         defaultScale = transform.localScale;
 
-        // if
-        InitTouchControlsSimple();
-
-        // if
-
-    }
-
-    void InitTouchControlsSimple() {
+        // todo if
         this.touchControlsSimple = GameObject.Find("TouchControlsSimple").GetComponent<TouchControlsSimple>();
-        // TouchControlsSimple = GameObject.Find("TouchControlsSimple").GetComponentsInChildren<Button>();
 
-        // TouchControlsSimple.Single(btn => btn.name == "Up").onClick.AddListener(() => {
-        //     Debug.Log("[IRPlayer][Update][TouchControlsSimple.Up]");
-        //     activeControls |= Controls.Up;
-        // });
-        // TouchControlsSimple.Single(btn => btn.name == "Down").OnPointerDown.AddListener(() => {
-        //     Debug.Log("[IRPlayer][Update][TouchControlsSimple.Down]");
-        //     activeControls |= Controls.Down;
-        // });
-        // TouchControlsSimple.Single(btn => btn.name == "Left").onClick.AddListener(() => {
-        //     // Debug.Log("[IRPlayer][Update][TouchControlsSimple.Left]");
-        //     activeControls |= Controls.Left;
-        // });
-        // TouchControlsSimple.Single(btn => btn.name == "Right").onClick.AddListener(() => {
-        //     // Debug.Log("[IRPlayer][Update][TouchControlsSimple.Right]");
-        //     activeControls |= Controls.Right;
-        // });
     }
 
     void Update()
@@ -197,7 +173,13 @@ public class IRPlayer : MonoBehaviour
     {
         if(collision.gameObject.tag == "Finish")
         {
-            GroundGenerator.instance.gameOver = true;
+            try {
+                GroundGenerator.instance.gameOver = true;
+            } catch {
+                Debug.Log("Failed to stop game!");
+                Debug.Log(GroundGenerator.instance);
+                Application.Quit();
+            }
         }
     }
 }
