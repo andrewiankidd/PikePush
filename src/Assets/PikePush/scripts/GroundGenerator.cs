@@ -109,6 +109,10 @@ public class GroundGenerator : MonoBehaviour
                 this.startGame();
             }
         }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            this.quitGame();
+        }
     }
 
     void startGame() {
@@ -123,6 +127,14 @@ public class GroundGenerator : MonoBehaviour
             //Start the game
             gameStarted = true;
         }
+    }
+
+    void quitGame() {
+
+        Application.Quit();
+
+        // todo
+        // SceneManager.LoadScene("PauseMenu");
     }
 
     void OnGUI()
