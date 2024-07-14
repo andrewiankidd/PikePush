@@ -1,9 +1,13 @@
 using System;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 [RequireComponent(typeof(Rigidbody))]
 
 public class IRPlayer : MonoBehaviour
 {
+    public TouchControlsSimple touchControlsSimple;
+    // public Button[] TouchControlsSimple;
 
     [Flags]
     enum Controls {
@@ -31,12 +35,65 @@ public class IRPlayer : MonoBehaviour
         r.freezeRotation = true;
         r.useGravity = false;
         defaultScale = transform.localScale;
+
+        // if
+        InitTouchControlsSimple();
+
+        // if
+
+    }
+
+    void InitTouchControlsSimple() {
+        this.touchControlsSimple = GameObject.Find("TouchControlsSimple").GetComponent<TouchControlsSimple>();
+        // TouchControlsSimple = GameObject.Find("TouchControlsSimple").GetComponentsInChildren<Button>();
+
+        // TouchControlsSimple.Single(btn => btn.name == "Up").onClick.AddListener(() => {
+        //     Debug.Log("[IRPlayer][Update][TouchControlsSimple.Up]");
+        //     activeControls |= Controls.Up;
+        // });
+        // TouchControlsSimple.Single(btn => btn.name == "Down").OnPointerDown.AddListener(() => {
+        //     Debug.Log("[IRPlayer][Update][TouchControlsSimple.Down]");
+        //     activeControls |= Controls.Down;
+        // });
+        // TouchControlsSimple.Single(btn => btn.name == "Left").onClick.AddListener(() => {
+        //     // Debug.Log("[IRPlayer][Update][TouchControlsSimple.Left]");
+        //     activeControls |= Controls.Left;
+        // });
+        // TouchControlsSimple.Single(btn => btn.name == "Right").onClick.AddListener(() => {
+        //     // Debug.Log("[IRPlayer][Update][TouchControlsSimple.Right]");
+        //     activeControls |= Controls.Right;
+        // });
     }
 
     void Update()
     {
         #region control checks
         Controls activeControls = Controls.Idle;
+
+        if (touchControlsSimple.controls.Left)
+        {
+            Debug.Log(touchControlsSimple.controls.Left);
+
+            activeControls |= Controls.Left;
+        }
+        else if (touchControlsSimple.controls.Right)
+        {
+            Debug.Log(touchControlsSimple.controls.Right);
+
+            activeControls |= Controls.Right;
+        }
+        if (touchControlsSimple.controls.Up)
+        {
+            Debug.Log(touchControlsSimple.controls.Up);
+
+            activeControls |= Controls.Up;
+        }
+        else if (touchControlsSimple.controls.Down)
+        {
+            Debug.Log(touchControlsSimple.controls.Down);
+
+            activeControls |= Controls.Down;
+        }
 
         if (Input.touchCount > 0) {
             Touch touch = Input.GetTouch(0);
@@ -79,6 +136,8 @@ public class IRPlayer : MonoBehaviour
             activeControls |= Controls.Right;
         }
         #endregion
+
+        // Debug.Log($"activeControls: {activeControls.HasFlag(Controls.Left)}");
 
         #region game controls
         if (grounded) {
