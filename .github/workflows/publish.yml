@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      draft_upload_url: ${{ steps.create_draft_release.outputs.upload_url }}
     steps:
       - name: Get current date
         id: date
@@ -42,7 +43,7 @@ jobs:
           RELEASE_NAME: ${{ github.ref_name }} #-${{ steps.date.outputs.date }}
           GITHUB_TOKEN: ${{ github.token }}
 
-      - id: step_upload_url
+      - id: step_draft_upload_url
         if: github.ref != 'refs/heads/master'
         name: Store Release upload URL for proceeding jobs
         run: echo "::set-output name=upload_url::${{ steps.create_draft_release.outputs.upload_url }}"
