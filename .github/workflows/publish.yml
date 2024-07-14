@@ -153,27 +153,27 @@ jobs:
 
         include:
           - targetPlatform: StandaloneOSX
-            name: 'OSX'
+            name: 'OSX 🍎'
             channel: 'mac'
 
           - targetPlatform: StandaloneWindows64
-            name: 'Windows'
+            name: 'Windows 🪟'
             channel: 'windows'
 
           - targetPlatform: StandaloneLinux64
-            name: 'Linux'
+            name: 'Linux 🐧'
             channel: 'linux'
 
           - targetPlatform: WebGL
-            name: 'WebGL'
+            name: 'WebGL 🌐'
             channel: 'webgl'
 
           - targetPlatform: Android
-            name: 'Android'
+            name: 'Android 🤖'
             channel: 'android'
 
           - targetPlatform: iOS
-            name: 'iOS'
+            name: 'iOS 🍏'
             channel: 'ios'
     steps:
       # Checkout
@@ -214,9 +214,27 @@ jobs:
           cd Build && \
           zip -r "Build-${{ matrix.targetPlatform }}.zip" "${{ matrix.targetPlatform }}"
 
+      - name: ⬆️ Upload ${{ matrix.targetPlatform }} Draft Release
+        uses: actions/upload-release-asset@v1
+        if: github.ref != 'refs/heads/master'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.prepare_release.outputs.draft_upload_url }}
+          asset_path: Build/Build-${{ matrix.targetPlatform }}.zip
+          asset_name: ${{ matrix.targetPlatform }}-release.zip
+          asset_content_type: application/zip
+
+    #   - name: ⬆️ Upload ${{ matrix.targetPlatform }} Draft Release
+    #     uses: softprops/action-gh-release@v2
+    #     if: github.ref != 'refs/heads/master'
+    #     with:
+    #       files: |
+    #         ${{ matrix.targetPlatform }}-release.zip
+
       - name: ⬆️ Upload ${{ matrix.targetPlatform }} Release
         uses: actions/upload-release-asset@v1
-        # if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -225,12 +243,12 @@ jobs:
           asset_name: ${{ matrix.targetPlatform }}-release.zip
           asset_content_type: application/zip
 
-      # - name: ⬆️ Upload ${{ matrix.targetPlatform }} Release
-      #   uses: softprops/action-gh-release@v2
-      #   # if: github.ref == 'refs/heads/master'
-      #   with:
-      #     files: |
-      #       ${{ matrix.targetPlatform }}-release.zip
+    #   - name: ⬆️ Upload ${{ matrix.targetPlatform }} Release
+    #     uses: softprops/action-gh-release@v2
+    #     if: github.ref == 'refs/heads/master'
+    #     with:
+    #       files: |
+    #         ${{ matrix.targetPlatform }}-release.zip
 
   publish_web:
     name: Publish to GitHub Pages 🕸️
