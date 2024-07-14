@@ -190,8 +190,8 @@ jobs:
           zip -r "Build-${{ matrix.targetPlatform }}.zip" "${{ matrix.targetPlatform }}"
 
       - name: ⬆️ Upload ${{ matrix.targetPlatform }} Release
-        uses: actions/upload-release-asset@v1
-        if: github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        # if: github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -199,6 +199,13 @@ jobs:
           asset_path: Build/Build-${{ matrix.targetPlatform }}.zip
           asset_name: ${{ matrix.targetPlatform }}-release.zip
           asset_content_type: application/zip
+
+      - name: ⬆️ Upload ${{ matrix.targetPlatform }} Release
+        uses: actions/upload-release-asset@v1
+        # if: github.ref == 'refs/heads/master'
+        with:
+          files: |
+            ${{ matrix.targetPlatform }}-release.zip
 
   publish_web:
     name: Publish to GitHub Pages 🕸️
