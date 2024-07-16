@@ -38,7 +38,7 @@
   </TypeDate>
   <TypeDate>
     <guid>ef519bec2023fb1478d699bdc44c392d</guid>
-    <fileName>Assets/scripts/CustomizationMenuManager.cs</fileName>
+    <fileName>Assets/scripts/menus/CustomizationMenuManager.cs</fileName>
     <timeStamp>2023-04-30T17:29:10.0935525+01:00</timeStamp>
     <typeFullName>
       <string>CustomizationMenuManager</string>
@@ -65,7 +65,7 @@
   </TypeDate>
   <TypeDate>
     <guid>7fc518046553afa41a735abaf0d65753</guid>
-    <fileName>Assets/scripts/MainMenuManager.cs</fileName>
+    <fileName>Assets/scripts/menus/MainMenuManager.cs</fileName>
     <timeStamp>2023-04-30T00:19:27.9465308+01:00</timeStamp>
     <typeFullName>
       <string>MainMenuManager</string>
@@ -83,7 +83,7 @@
   </TypeDate>
   <TypeDate>
     <guid>21cff4bd1954806419e88da6c8e7222d</guid>
-    <fileName>Assets/scripts/SettingsMenuManager.cs</fileName>
+    <fileName>Assets/scripts/menus/SettingsMenuManager.cs</fileName>
     <timeStamp>2023-04-30T20:19:00.6332364+01:00</timeStamp>
     <typeFullName>
       <string>SettingsMenuManager</string>
