@@ -25,9 +25,8 @@ namespace PikePush.Controls {
             "TouchControlsSimple"
         };
 
-        public Controls testicle(ButtonControlsSimple ButtonControlsSimpleInstance)
+        public Controls InputCheck(ButtonControlsSimple ButtonControlsSimpleInstance, Controls activeControls)
         {
-            ControlsManager.Controls activeControls = ControlsManager.Controls.Idle;
 
             if (ButtonControlsSimpleInstance.isActiveAndEnabled)
             {
