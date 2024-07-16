@@ -10,9 +10,9 @@ namespace PikePush {
 
     public class IRPlayer : MonoBehaviour
     {
-        public GestureControlsSimple GestureControlsSimple;
+        public ButtonControlsSimple GestureControlsSimple;
         public ButtonControlsSimple ButtonControlsSimple;
-        public TouchControlsSimple TouchControlsSimple;
+        public ButtonControlsSimple TouchControlsSimple;
 
         public float gravity = 20.0f;
         public float jumpHeight = 2.5f;
@@ -25,9 +25,9 @@ namespace PikePush {
 
         void Awake()
         {
-            this.GestureControlsSimple = GameObject.FindObjectsOfType<GestureControlsSimple>(true).First();
-            this.ButtonControlsSimple = GameObject.FindObjectsOfType<ButtonControlsSimple>(true).First();
-            this.TouchControlsSimple = GameObject.FindObjectsOfType<TouchControlsSimple>(true).First();
+            this.GestureControlsSimple = GameObject.FindObjectsOfType<ButtonControlsSimple>(true).First(o => o.name == "GestureControlsSimple");
+            this.ButtonControlsSimple = GameObject.FindObjectsOfType<ButtonControlsSimple>(true).First(o => o.name == "ButtonControlsSimple");
+            this.TouchControlsSimple = GameObject.FindObjectsOfType<ButtonControlsSimple>(true).First(o => o.name == "TouchControlsSimple");
         }
 
         // Start is called before the first frame update
@@ -43,17 +43,20 @@ namespace PikePush {
             string touchControlsDropdown = PlayerPrefs.GetString("TouchControlsDropdown");
             Debug.Log($"[IRPlayer][Update]TouchControlsDropdown: {touchControlsDropdown}");
 
+            this.GestureControlsSimple.gameObject.SetActive(false);
+            this.ButtonControlsSimple.gameObject.SetActive(false);
+            this.TouchControlsSimple.gameObject.SetActive(false);
             if (touchControlsDropdown == "1")
             {
-                GameObject.Find("GestureControlsSimple").gameObject.SetActive(true);
+                this.GestureControlsSimple.gameObject.SetActive(true);
             }
             else if (touchControlsDropdown == "2")
             {
-                GameObject.Find("ButtonControlsSimple").gameObject.SetActive(true);
+                this.ButtonControlsSimple.gameObject.SetActive(true);
             }
             else if (touchControlsDropdown == "3")
             {
-                GameObject.Find("TouchControlsSimple").gameObject.SetActive(true);
+                this.TouchControlsSimple.gameObject.SetActive(true);
             }
         }
 
@@ -62,7 +65,35 @@ namespace PikePush {
             #region control checks
             ControlsManager.Controls activeControls = ControlsManager.Controls.Idle;
 
-            if (this.ButtonControlsSimple.enabled)
+            if (this.GestureControlsSimple.isActiveAndEnabled)
+            {
+                if (GestureControlsSimple.controls.Left)
+                {
+                    Debug.Log(GestureControlsSimple.controls.Left);
+
+                    activeControls |= ControlsManager.Controls.Left;
+                }
+                else if (GestureControlsSimple.controls.Right)
+                {
+                    Debug.Log(GestureControlsSimple.controls.Right);
+
+                    activeControls |= ControlsManager.Controls.Right;
+                }
+                if (GestureControlsSimple.controls.Up)
+                {
+                    Debug.Log(GestureControlsSimple.controls.Up);
+
+                    activeControls |= ControlsManager.Controls.Up;
+                }
+                else if (GestureControlsSimple.controls.Down)
+                {
+                    Debug.Log(GestureControlsSimple.controls.Down);
+
+                    activeControls |= ControlsManager.Controls.Down;
+                }
+            }
+
+            if (this.ButtonControlsSimple.isActiveAndEnabled)
             {
                 if (ButtonControlsSimple.controls.Left)
                 {
@@ -90,23 +121,31 @@ namespace PikePush {
                 }
             }
 
-            if (Input.touchCount > 0) {
-                Touch touch = Input.GetTouch(0);
+            if (this.TouchControlsSimple.isActiveAndEnabled)
+            {
+                if (TouchControlsSimple.controls.Left)
+                {
+                    Debug.Log(TouchControlsSimple.controls.Left);
 
-                if (touch.position.y > (Screen.width/3))
-                {
-                    activeControls |= ControlsManager.Controls.Up;
-                } else if (touch.position.y < (Screen.width/3))
-                {
-                    activeControls |= ControlsManager.Controls.Down;
-                }
-                if (touch.position.x < (Screen.width/3))
-                {
                     activeControls |= ControlsManager.Controls.Left;
                 }
-                else if (touch.position.x > (Screen.width/3))
+                else if (TouchControlsSimple.controls.Right)
                 {
+                    Debug.Log(TouchControlsSimple.controls.Right);
+
                     activeControls |= ControlsManager.Controls.Right;
+                }
+                if (TouchControlsSimple.controls.Up)
+                {
+                    Debug.Log(TouchControlsSimple.controls.Up);
+
+                    activeControls |= ControlsManager.Controls.Up;
+                }
+                else if (TouchControlsSimple.controls.Down)
+                {
+                    Debug.Log(TouchControlsSimple.controls.Down);
+
+                    activeControls |= ControlsManager.Controls.Down;
                 }
             }
 

@@ -31,7 +31,14 @@ namespace PikePush.Menus {
 
         // Start is called before the first frame update
         void Start () {
-            int nNumber = int.TryParse(PlayerPrefs.GetString("TouchControlsDropdown"), out nNumber) ? nNumber : 0;
+
+            int defaultControlScheme = 0;
+
+            if (Application.platform is RuntimePlatform.Android or RuntimePlatform.IPhonePlayer or RuntimePlatform.WebGLPlayer or RuntimePlatform) {
+                defaultControlScheme = 2;
+            }
+
+            int nNumber = int.TryParse(PlayerPrefs.GetString("TouchControlsDropdown"), out nNumber) ? nNumber : defaultControlScheme;
             Debug.Log($"[SettingsMenuManager][Start]TouchControlsDropdown.SetValueWithoutNotify: {nNumber}");
             TouchControlsDropdown.value = (nNumber);
         }
