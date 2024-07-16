@@ -15,16 +15,16 @@ namespace PikePush.Menus {
     public class SettingsMenuManager : MonoBehaviour
     {
 
-        public TMP_Dropdown TouchControlsDropdown;
+        public TMPro.TMP_Dropdown TouchControlsDropdown;
 
         void Awake () {
             // TouchControlsDropdown
-            TouchControlsDropdown = GameObject.Find("TouchControlsDropdown").GetComponent<TMP_Dropdown>();
+            TouchControlsDropdown = GameObject.Find("TouchControlsDropdown").GetComponent<TMPro.TMP_Dropdown>();
             // TouchControlsDropdown.options.Clear();
             foreach (string controlOption in Controls.ControlsManager.ControlSchemes)
             {
                 Debug.Log($"[SettingsMenuManager][Awake]controlOption: {controlOption}");
-                TouchControlsDropdown.options.Add(new TMP_Dropdown.OptionData(){ text = controlOption });
+                TouchControlsDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData(){ text = controlOption });
             }
 
         }
