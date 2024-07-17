@@ -16,14 +16,16 @@ namespace PikePush {
 
         private ControlsManager controlsManager;
 
-        public float gravity = 20.0f;
-        public float jumpHeight = 2.5f;
-        public float strafeSpeed = 2.75f;
+        public static float gravity = 20.0f;
+        public static float jumpHeight = 2.5f;
+        public static float strafeSpeed = 2.75f;
+
+        public static float movingSpeed = 4f;
 
         Rigidbody r;
         bool grounded = false;
         Vector3 defaultScale;
-        bool crouch = false;
+        bool crouching = false;
 
         void Awake()
         {
@@ -103,12 +105,33 @@ namespace PikePush {
                     Debug.Log("[IRPlayer][Update][Jump]");
                     r.velocity = new Vector3(r.velocity.x, CalculateJumpVerticalSpeed(), r.velocity.z);
                 }
-                else if (activeControls.HasFlag(ControlsManager.Controls.Down))
-                {
-                    Debug.Log("[IRPlayer][Update][Crouch]");
-                    transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(defaultScale.x, defaultScale.y * 0.4f, defaultScale.z), Time.deltaTime * 7);
+                else {
+                    if (activeControls.HasFlag(ControlsManager.Controls.Down))
+                    {
+                        Debug.Log("[IRPlayer][Update][Crouch]");
+                        transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(defaultScale.x, defaultScale.y * 0.4f, defaultScale.z), Time.deltaTime * 7);
+
+                        if (!this.crouching)
+                        {
+                            IRPlayer.movingSpeed = IRPlayer.movingSpeed / 2;
+                            this.crouching = true;
+                        }
+                        Debug.Log($"[IRPlayer][Update][Crouch] IRPlayer.movingSpeed: {IRPlayer.movingSpeed}");
+                    }
+                    else
+                    {
+                        transform.localScale = Vector3.Lerp(transform.localScale, defaultScale, Time.deltaTime * 7);
+
+                        if (this.crouching)
+                        {
+                            Debug.Log("[IRPlayer][Update][UnCrouch]");
+                            IRPlayer.movingSpeed = IRPlayer.movingSpeed * 2;
+                            this.crouching = false;
+                        }
+                    }
                 }
-                else if (activeControls.HasFlag(ControlsManager.Controls.Left) && r.position.x > -strafeSpeed)
+
+                if (activeControls.HasFlag(ControlsManager.Controls.Left) && r.position.x > -strafeSpeed)
                 {
                     Debug.Log("[IRPlayer][Update][StrafeLeft]");
                     r.position = new Vector3(r.position.x - (Time.deltaTime * strafeSpeed), r.position.y, r.position.z);
@@ -118,12 +141,6 @@ namespace PikePush {
                     Debug.Log("[IRPlayer][Update][StrafeRight]");
                     r.position = new Vector3(r.position.x + (Time.deltaTime * strafeSpeed), r.position.y, r.position.z);
                 }
-                else
-                {
-                    // Debug.Log("[IRPlayer][Update][UnCrouch]");
-                    transform.localScale = Vector3.Lerp(transform.localScale, defaultScale, Time.deltaTime * 7);
-                }
-
             }
 
             #endregion
@@ -134,7 +151,6 @@ namespace PikePush {
         {
             // We apply gravity manually for more tuning control
             r.AddForce(new Vector3(0, -gravity * r.mass, 0));
-
             grounded = false;
         }
 

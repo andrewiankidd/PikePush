@@ -36,7 +36,6 @@ namespace PikePush {
         // runner game vars
         public Transform startPoint; //Point from where ground tiles will start
         public PlatformTile tilePrefab;
-        public float movingSpeed = 12;
         public int tilesToPreSpawn = 15; //How many tiles should be pre-spawned
         public int tilesWithoutObstacles = 3; //How many tiles at the beginning should not have obstacles, good for warm-up
         List<PlatformTile> spawnedTiles = new List<PlatformTile>();
@@ -89,8 +88,9 @@ namespace PikePush {
             //Increase speed the higher score we get
             if (!gameOver && gameStarted)
             {
-                transform.Translate(-spawnedTiles[0].transform.forward * Time.deltaTime * (movingSpeed + (score/500)), Space.World);
-                score += Time.deltaTime * movingSpeed;
+                Debug.Log($"[GroundGenerator][Update]IRPlayer.movingSpeed: {IRPlayer.movingSpeed}");
+                transform.Translate(-spawnedTiles[0].transform.forward * Time.deltaTime * (IRPlayer.movingSpeed + (score/500)), Space.World);
+                score += Time.deltaTime * IRPlayer.movingSpeed;
             }
 
             if (mainCamera.WorldToViewportPoint(spawnedTiles[0].endPoint.position).z < 0)
