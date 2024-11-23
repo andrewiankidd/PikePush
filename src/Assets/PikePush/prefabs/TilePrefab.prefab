@@ -19791,7 +19791,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2226713876671449493
 Transform:
   m_ObjectHideFlags: 0
@@ -29061,6 +29061,9 @@ MonoBehaviour:
   startPoint: {fileID: 7506521199272211812}
   endPoint: {fileID: 7506521199421390470}
   obstacles:
+  - {fileID: 7506521198441958106}
+  - {fileID: 7506521199385027615}
+  - {fileID: 7506521197723589707}
   - {fileID: 5373759748359485401}
 --- !u!1 &7506521199561610050
 GameObject:
