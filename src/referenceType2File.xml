@@ -47,10 +47,10 @@
   </TypeDate>
   <TypeDate>
     <guid>2e27858cb269bed41b5d062701b08708</guid>
-    <fileName>Assets/scripts/GroundGenerator.cs</fileName>
+    <fileName>Assets/scripts/MainGame.cs</fileName>
     <timeStamp>2023-04-30T21:54:59.7330043+01:00</timeStamp>
     <typeFullName>
-      <string>GroundGenerator</string>
+      <string>MainGame</string>
     </typeFullName>
     <assembly>Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</assembly>
   </TypeDate>
