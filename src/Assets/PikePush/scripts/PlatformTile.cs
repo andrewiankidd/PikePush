@@ -6,7 +6,7 @@ namespace PikePush {
     {
         public Transform startPoint;
         public Transform endPoint;
-        public GameObject[] obstacles; //Objects that contains different obstacle types which will be randomly activated
+        public GameObject[] obstacles;
 
         public void ActivateRandomObstacle()
         {

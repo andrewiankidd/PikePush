@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using PikePush.Controls;
+using PikePush.UI;
 
 namespace PikePush {
 
@@ -13,21 +14,19 @@ namespace PikePush {
         public ButtonControlsSimple GestureControlsSimple;
         public ButtonControlsSimple ButtonControlsSimple;
         public ButtonControlsSimple TouchControlsSimple;
-
         private ControlsManager controlsManager;
 
         public static float gravity = 20.0f;
         public static float jumpHeight = 2.5f;
         public static float strafeSpeed = 2.75f;
-
-        public static float movingSpeed = 4f;
+        public static float movementSpeed = 4f;
 
         Rigidbody r;
         bool grounded = false;
         Vector3 defaultScale;
         bool crouching = false;
 
-        void Awake()
+        public void Awake()
         {
             this.GestureControlsSimple = GameObject.FindObjectsOfType<ButtonControlsSimple>(true).First(o => o.name == "GestureControlsSimple");
             this.ButtonControlsSimple = GameObject.FindObjectsOfType<ButtonControlsSimple>(true).First(o => o.name == "ButtonControlsSimple");
@@ -36,7 +35,7 @@ namespace PikePush {
         }
 
         // Start is called before the first frame update
-        void Start()
+        public void Start()
         {
             r = GetComponent<Rigidbody>();
             r.constraints = RigidbodyConstraints.FreezePositionZ;
@@ -65,7 +64,7 @@ namespace PikePush {
             }
         }
 
-        void Update()
+        public void Update()
         {
             #region control checks
             ControlsManager.Controls activeControls = ControlsManager.Controls.Idle;
@@ -113,10 +112,10 @@ namespace PikePush {
 
                         if (!this.crouching)
                         {
-                            IRPlayer.movingSpeed = IRPlayer.movingSpeed / 2;
+                            IRPlayer.movementSpeed = IRPlayer.movementSpeed / 2;
                             this.crouching = true;
                         }
-                        Debug.Log($"[IRPlayer][Update][Crouch] IRPlayer.movingSpeed: {IRPlayer.movingSpeed}");
+                        Debug.Log($"[IRPlayer][Update][Crouch] IRPlayer.movementSpeed: {IRPlayer.movementSpeed}");
                     }
                     else
                     {
@@ -125,7 +124,7 @@ namespace PikePush {
                         if (this.crouching)
                         {
                             Debug.Log("[IRPlayer][Update][UnCrouch]");
-                            IRPlayer.movingSpeed = IRPlayer.movingSpeed * 2;
+                            IRPlayer.movementSpeed = IRPlayer.movementSpeed * 2;
                             this.crouching = false;
                         }
                     }
@@ -147,14 +146,14 @@ namespace PikePush {
         }
 
         // Update is called once per frame
-        void FixedUpdate()
+        public void FixedUpdate()
         {
             // We apply gravity manually for more tuning control
             r.AddForce(new Vector3(0, -gravity * r.mass, 0));
             grounded = false;
         }
 
-        void OnCollisionStay()
+        public void OnCollisionStay()
         {
             grounded = true;
         }
@@ -166,19 +165,27 @@ namespace PikePush {
             return Mathf.Sqrt(2 * jumpHeight * gravity);
         }
 
-        void OnCollisionEnter(Collision collision)
+        public void OnCollisionEnter(Collision collision)
         {
-            if(collision.gameObject.tag == "Finish")
-            {
-                try {
-                    GroundGenerator.instance.gameOver = true;
-                } catch {
-                    Debug.Log("Failed to stop game!");
-                    Debug.Log(GroundGenerator.instance);
-                    Application.Quit();
+            try {
+                Debug.Log($"[IRPlayer][OnCollisionEnter]: {collision.gameObject.tag}");
+                switch (collision.gameObject.tag)
+                {
+                    case "Finish":
+                        MainGame.instance.gameOver = true;
+                        break;
+                    case "Fight":
+                        MainGame.instance.startFight(collision.gameObject);
+                        break;
+                    default:
+                        Debug.LogWarning($"Collision with unknown object");
+                        break;
                 }
+            } catch {
+                Debug.Log("Error handling collision");
+                Debug.Log(MainGame.instance);
+                Application.Quit();
             }
         }
     }
-
 }
