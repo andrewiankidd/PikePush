@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using PikePush.Controls;
 using PikePush.UI;
+using PikePush.Utls;
+
 
 namespace PikePush {
 
@@ -44,13 +46,13 @@ namespace PikePush {
             if (grounded) {
                 if (activeControls.HasFlag(ControlsManager.Controls.Up))
                 {
-                    Debug.Log("[IRPlayer][Update][Jump]");
+                    LogHelper.debug("[IRPlayer][Update][Jump]");
                     r.velocity = new Vector3(r.velocity.x, CalculateJumpVerticalSpeed(), r.velocity.z);
                 }
                 else {
                     if (activeControls.HasFlag(ControlsManager.Controls.Down))
                     {
-                        Debug.Log("[IRPlayer][Update][Crouch]");
+                        LogHelper.debug("[IRPlayer][Update][Crouch]");
                         transform.localScale = Vector3.Lerp(transform.localScale, new Vector3(defaultScale.x, defaultScale.y * 0.4f, defaultScale.z), Time.deltaTime * 7);
 
                         if (!this.crouching)
@@ -58,7 +60,7 @@ namespace PikePush {
                             IRPlayer.movementSpeed = IRPlayer.movementSpeed / 2;
                             this.crouching = true;
                         }
-                        Debug.Log($"[IRPlayer][Update][Crouch] IRPlayer.movementSpeed: {IRPlayer.movementSpeed}");
+                        LogHelper.debug($"[IRPlayer][Update][Crouch] IRPlayer.movementSpeed: {IRPlayer.movementSpeed}");
                     }
                     else
                     {
@@ -66,7 +68,7 @@ namespace PikePush {
 
                         if (this.crouching)
                         {
-                            Debug.Log("[IRPlayer][Update][UnCrouch]");
+                            LogHelper.debug("[IRPlayer][Update][UnCrouch]");
                             IRPlayer.movementSpeed = IRPlayer.movementSpeed * 2;
                             this.crouching = false;
                         }
@@ -75,12 +77,12 @@ namespace PikePush {
 
                 if (activeControls.HasFlag(ControlsManager.Controls.Left) && r.position.x > -strafeSpeed)
                 {
-                    Debug.Log("[IRPlayer][Update][StrafeLeft]");
+                    LogHelper.debug("[IRPlayer][Update][StrafeLeft]");
                     r.position = new Vector3(r.position.x - (Time.deltaTime * strafeSpeed), r.position.y, r.position.z);
                 }
                 else if (activeControls.HasFlag(ControlsManager.Controls.Right) && r.position.x < strafeSpeed)
                 {
-                    Debug.Log("[IRPlayer][Update][StrafeRight]");
+                    LogHelper.debug("[IRPlayer][Update][StrafeRight]");
                     r.position = new Vector3(r.position.x + (Time.deltaTime * strafeSpeed), r.position.y, r.position.z);
                 }
             }
@@ -111,7 +113,7 @@ namespace PikePush {
         public void OnCollisionEnter(Collision collision)
         {
             try {
-                Debug.Log($"[IRPlayer][OnCollisionEnter]: {collision.gameObject.tag}");
+                LogHelper.debug($"[IRPlayer][OnCollisionEnter]: {collision.gameObject.tag}");
                 switch (collision.gameObject.tag)
                 {
                     case "Finish":
@@ -121,12 +123,12 @@ namespace PikePush {
                         MainGame.instance.startFight(collision.gameObject);
                         break;
                     default:
-                        Debug.LogWarning($"Collision with unknown object");
+                        LogHelper.warn($"Collision with unknown object");
                         break;
                 }
             } catch {
-                Debug.Log("Error handling collision");
-                Debug.Log(MainGame.instance);
+                LogHelper.debug("Error handling collision");
+                LogHelper.debug(MainGame.instance);
                 Application.Quit();
             }
         }

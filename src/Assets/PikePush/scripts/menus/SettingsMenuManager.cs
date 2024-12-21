@@ -9,6 +9,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using PikePush.Controls;
+using PikePush.Utls;
+
 
 namespace PikePush.Menus {
 
@@ -23,7 +25,7 @@ namespace PikePush.Menus {
             // TouchControlsDropdown.options.Clear();
             foreach (string controlOption in Controls.ControlsManager.controlSchemes)
             {
-                Debug.Log($"[SettingsMenuManager][Awake]controlOption: {controlOption}");
+                LogHelper.debug($"[SettingsMenuManager][Awake]controlOption: {controlOption}");
                 TouchControlsDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData(){ text = controlOption });
             }
 
@@ -34,12 +36,18 @@ namespace PikePush.Menus {
 
             int defaultControlScheme = 0;
 
-            if (Application.platform is RuntimePlatform.Android or RuntimePlatform.IPhonePlayer or RuntimePlatform.WebGLPlayer or RuntimePlatform) {
-                defaultControlScheme = 2;
+            // todo lol
+            if (
+                Application.platform is RuntimePlatform.Android
+                or RuntimePlatform.IPhonePlayer
+                or RuntimePlatform.WebGLPlayer
+                or RuntimePlatform
+            ) {
+                defaultControlScheme = 1;
             }
 
             int nNumber = int.TryParse(PlayerPrefs.GetString("TouchControlsDropdown"), out nNumber) ? nNumber : defaultControlScheme;
-            Debug.Log($"[SettingsMenuManager][Start]TouchControlsDropdown.SetValueWithoutNotify: {nNumber}");
+            LogHelper.debug($"[SettingsMenuManager][Start]TouchControlsDropdown.SetValueWithoutNotify: {nNumber}");
             TouchControlsDropdown.value = (nNumber);
         }
 
@@ -50,7 +58,7 @@ namespace PikePush.Menus {
         }
 
         public void OnTouchControlsDropdownValueChanged() {
-            Debug.Log($"[SettingsMenuManager][OnTouchControlsDropdownValueChanged]value: {TouchControlsDropdown.value}");
+            LogHelper.debug($"[SettingsMenuManager][OnTouchControlsDropdownValueChanged]value: {TouchControlsDropdown.value}");
             PlayerPrefs.SetString("TouchControlsDropdown", TouchControlsDropdown.value.ToString());
         }
 

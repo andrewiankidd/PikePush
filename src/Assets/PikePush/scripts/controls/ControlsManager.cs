@@ -1,10 +1,9 @@
 using System;
-using System.Reflection;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using System.Linq;
+using PikePush.Utls;
+
 
 namespace PikePush.Controls {
 
@@ -34,7 +33,7 @@ namespace PikePush.Controls {
 
         public void Awake()
         {
-            Debug.Log($"[ControlsManager][Awake] Starting up...");
+            LogHelper.debug($"[ControlsManager][Awake] Starting up...");
 
             // find gameobject for each available controlscheme
             foreach (string controlScheme in controlSchemes)
@@ -42,43 +41,32 @@ namespace PikePush.Controls {
                 var controlSchemeGameObject = GameObject.FindObjectsOfType<ControlScheme>(true).First(o => o.name == controlScheme);
                 if (controlSchemeGameObject)
                 {
-                    Debug.Log($"[ControlsManager][Awake] Adding schema: {controlScheme}");
+                    LogHelper.debug($"[ControlsManager][Awake] Adding schema: {controlScheme}");
                     controlSchemeGameObject.gameObject.SetActive(false);
-                    if (!controlSchemeInstances.ContainsKey(controlScheme))
-                    {
-                        controlSchemeInstances.Add(controlScheme, controlSchemeGameObject);
-                    }
+                    controlSchemeInstances[controlScheme] = controlSchemeGameObject;
                 }
                 
             }
 
-            // todo lol
-            string touchControlsDropdown = PlayerPrefs.GetString("TouchControlsDropdown");
-            if (touchControlsDropdown == "1")
+            // read prefs
+            int touchControlsDropdown = Int32.Parse(PlayerPrefs.GetString("TouchControlsDropdown", "0"));
+            if (touchControlsDropdown > 0)
             {
-                if (controlSchemeInstances["GestureControlsSimple"].gameObject)
+                var x = controlSchemes[touchControlsDropdown - 1];
+                var selectedControlScheme = controlSchemeInstances.First(o => o.Key == x);
+                if (selectedControlScheme.Value && selectedControlScheme.Value.gameObject)
                 {
-                    controlSchemeInstances["GestureControlsSimple"].gameObject.SetActive(true);
-                }
-            }
-            else if (touchControlsDropdown == "2")
-            {
-                if (controlSchemeInstances["ButtonControlsSimple"].gameObject)
-                {
-                    controlSchemeInstances["ButtonControlsSimple"].gameObject.SetActive(true);
-                }
-            }
-            else if (touchControlsDropdown == "3")
-            {
-                if (controlSchemeInstances["TouchControlsSimple"].gameObject)
-                {
-                    controlSchemeInstances["TouchControlsSimple"].gameObject.SetActive(true);
+                    LogHelper.debug($"[ControlsManager][Awake] activating schema '{touchControlsDropdown}': {selectedControlScheme.Key}");
+                    selectedControlScheme.Value.gameObject.SetActive(true);
                 }
             }
 
-            if (controlSchemeInstances["ExternalControlsSimple"] && controlSchemeInstances["ExternalControlsSimple"].gameObject)
+            // always enable external controls
+            var scheme = "ExternalControlsSimple";
+            if (controlSchemeInstances[scheme].gameObject)
             {
-                controlSchemeInstances["ExternalControlsSimple"].gameObject.SetActive(true);
+                LogHelper.debug($"[ControlsManager][Awake] activating schema: {scheme}");
+                controlSchemeInstances[scheme].gameObject.SetActive(true);
             }
         }
 
@@ -86,49 +74,49 @@ namespace PikePush.Controls {
         {
             Controls activeControls = Controls.Idle;
 
-            Debug.Log($"[ControlsManager][InputCheck]Available schemes: {string.Join(", ", controlSchemeInstances.Keys)}");
+            LogHelper.debug($"[ControlsManager][InputCheck]Available schemes: {string.Join(", ", controlSchemeInstances.Keys)}");
             foreach (var controlScheme in controlSchemeInstances)
             {
-                Debug.Log($"[ControlsManager][InputCheck][{controlScheme.Key}]");
+                LogHelper.debug($"[ControlsManager][InputCheck][{controlScheme.Key}]");
 
                 if (controlScheme.Value && controlScheme.Value.isActiveAndEnabled)
                 {
                     if (controlScheme.Value.controls.Left)
                     {
-                        Debug.Log($"[ControlsManager][InputCheck][Left]");
+                        LogHelper.debug($"[ControlsManager][InputCheck][Left]");
 
                         activeControls |= ControlsManager.Controls.Left;
                     }
                     else if (controlScheme.Value.controls.Right)
                     {
-                        Debug.Log($"[ControlsManager][InputCheck][Right]");
+                        LogHelper.debug($"[ControlsManager][InputCheck][Right]");
 
                         activeControls |= ControlsManager.Controls.Right;
                     }
 
                     if (controlScheme.Value.controls.Up)
                     {
-                        Debug.Log($"[ControlsManager][InputCheck][Up]");
+                        LogHelper.debug($"[ControlsManager][InputCheck][Up]");
 
                         activeControls |= ControlsManager.Controls.Up;
                     }
                     else if (controlScheme.Value.controls.Down)
                     {
-                        Debug.Log($"[ControlsManager][InputCheck][Down]");
+                        LogHelper.debug($"[ControlsManager][InputCheck][Down]");
 
                         activeControls |= ControlsManager.Controls.Down;
                     }
 
                     if (controlScheme.Value.controls.Escape)
                     {
-                        Debug.Log($"[ControlsManager][InputCheck][Escape]");
+                        LogHelper.debug($"[ControlsManager][InputCheck][Escape]");
 
                         activeControls |= ControlsManager.Controls.Escape;
                     }
 
                     if (controlScheme.Value.controls.Space)
                     {
-                        Debug.Log($"[ControlsManager][InputCheck][Space]");
+                        LogHelper.debug($"[ControlsManager][InputCheck][Space]");
 
                         activeControls |= ControlsManager.Controls.Space;
                     }

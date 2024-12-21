@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using PikePush.UI;
 using PikePush.Controls;
+using PikePush.Utls;
+
 
 namespace PikePush {
 
@@ -75,6 +77,8 @@ namespace PikePush {
         public bool gameStarted = false;
 
         public bool fightActive = false;
+
+        ControlsManager.Controls activeControls;
 
         private GameObject enemyObject = null;
 
@@ -167,7 +171,7 @@ namespace PikePush {
             bool gameActive = (gameStarted && !gameOver);
 
             // get inputs
-            ControlsManager.Controls activeControls = this.controlsManager.InputCheck();
+            this.activeControls = this.controlsManager.InputCheck();
 
             if (gameActive)
             {
@@ -190,7 +194,7 @@ namespace PikePush {
                 else
                 {
                     // Log the player's movement speed
-                    Debug.Log($"[MainGame][Update]IRPlayer.movementSpeed: {IRPlayer.movementSpeed}");
+                    LogHelper.debug($"[MainGame][Update]IRPlayer.movementSpeed: {IRPlayer.movementSpeed}");
 
                     // Calculate dynamic movement speed
                     float movementSpeed = IRPlayer.movementSpeed + (score / 500);
@@ -209,7 +213,7 @@ namespace PikePush {
             else
             {
                 // Start the game if the player presses Space
-                if (activeControls.HasFlag(ControlsManager.Controls.Space))
+                if (this.activeControls.HasFlag(ControlsManager.Controls.Space))
                 {
                     messageBox.Close();
                     this.StartGame();
@@ -217,10 +221,10 @@ namespace PikePush {
             }
 
             // Handle quitting the game
-            if (activeControls.HasFlag(ControlsManager.Controls.Escape))
+            if (this.activeControls.HasFlag(ControlsManager.Controls.Escape))
             {
-                Debug.Log($"[MainGame][Update]Quitting game");
-                Debug.Log(activeControls);
+                LogHelper.debug($"[MainGame][Update]Quitting game");
+                LogHelper.debug(this.activeControls);
                 this.QuitGame();
             }
         }
@@ -232,7 +236,7 @@ namespace PikePush {
             if (gameOver)
             {
                 Scene scene = SceneManager.GetActiveScene();
-                SceneManager.LoadScene(scene.name);
+                SceneManager.LoadScene(scene.buildIndex);
             }
             else
             {
@@ -257,36 +261,59 @@ namespace PikePush {
             }
             else if (!gameStarted)
             {
-                var msg = messageBox.Show(
-                    "Begin",
-                    "Press 'Space' to start!"
-                );
-                msg.onClick.AddListener(() =>
+                if (messageBox)
                 {
-                    Debug.Log("[OnGUI][MessageBox][StartGame]");
-                    this.StartGame();
-                });
+                    if (!messageBox.isActiveAndEnabled)
+                    {
+                        messageBox.Show(
+                            "Begin",
+                            "Press 'Space' to start!"
+                        );
+
+                    }
+                    else
+                    {
+                        // Start the game if the player presses Space
+                        if (this.activeControls.HasFlag(ControlsManager.Controls.Space))
+                        {
+                            messageBox.Close();
+                            this.StartGame();
+                        }
+                    }
+                }
             }
         }
 
         // Displays the Game Over screen
         private void GameOver()
         {
-            var msg = messageBox.Show(
-                "Game Over!",
-                "Press 'Space' to restart!"
-            );
-            msg.onClick.AddListener(() =>
+            if (messageBox)
             {
-                Debug.Log("[GameOver][MessageBox][StartGame]");
-                this.StartGame();
-            });
+                if (!messageBox.isActiveAndEnabled)
+                {
+                    messageBox.Show(
+                    "Game Over!",
+                    "Press 'Space' to restart!"
+                );
+
+                }
+                else
+                {
+                    // Start the game if the player presses Space
+                    if (this.activeControls.HasFlag(ControlsManager.Controls.Space))
+                    {
+                        LogHelper.debug("[GameOver][MessageBox][StartGame]");
+                        this.StartGame();
+                    }
+                }
+            }
+
         }
 
         // Parses a color from a string format "R,G,B"
         private Color ParseColourFromString(string colourString)
         {
-            Debug.Log("ParseColourFromString: " + colourString);
+            LogHelper.debug("ParseColourFromString: " + colourString);
             byte[] colourValues = Array.ConvertAll(colourString.Split(','), byte.Parse);
             return new Color32(colourValues[0], colourValues[1], colourValues[2], 255);
         }

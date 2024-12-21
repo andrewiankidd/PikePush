@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using PikePush.Utls;
 
 namespace FreeDraw
 {
@@ -115,7 +116,7 @@ namespace FreeDraw
             }
             ApplyMarkedPixelChanges();
 
-            //Debug.Log("Dimensions: " + pixelWidth + "," + pixelHeight + ". Units to pixels: " + unitsToPixels + ". Pixel pos: " + pixel_pos);
+            //LogHelper.debug("Dimensions: " + pixelWidth + "," + pixelHeight + ". Units to pixels: " + unitsToPixels + ". Pixel pos: " + pixel_pos);
             previous_drag_position = pixel_pos;
         }
 
@@ -283,7 +284,7 @@ namespace FreeDraw
         // Changes every pixel to be the reset colour
         public void ResetCanvas()
         {
-            Debug.Log("ResetCanvas!");
+            LogHelper.debug("ResetCanvas!");
             drawable_texture.SetPixels(clean_colours_array);
             drawable_texture.Apply();
         }

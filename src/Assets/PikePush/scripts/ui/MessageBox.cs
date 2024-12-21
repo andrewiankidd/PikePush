@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using PikePush.Controls;
 using UnityEngine;
 using UnityEngine.UI;
+using PikePush.Utls;
 
 namespace PikePush.UI {
 
@@ -34,19 +33,24 @@ namespace PikePush.UI {
 
         }
 
-        public Button Show(string messageTitle, string messageBody)
+        public void Show(string messageTitle, string messageBody)
         {
-            Debug.Log($"[MessageBox][Show]messageTitle: {messageTitle}, messageBody: {messageBody}");
-            this.TitleLabel.text = messageTitle;
-            this.MessageLabel.text = messageBody;
-            this.gameObject.SetActive(true);
-            return this.SpaceButton;
+            if (!this.gameObject.activeInHierarchy)
+            {
+                LogHelper.debug($"[MessageBox][Show]messageTitle: {messageTitle}, messageBody: {messageBody}");
+                this.TitleLabel.text = messageTitle;
+                this.MessageLabel.text = messageBody;
+                this.gameObject.SetActive(true);
+            }            
         }
 
         public void Close()
         {
-            Debug.Log("[MessageBox][Close]");
-            this.gameObject.SetActive(false);
+            if (this.gameObject.activeInHierarchy)
+            {
+                LogHelper.debug("[MessageBox][Close]");
+                this.gameObject.SetActive(false);
+            }
         }
     }
 
