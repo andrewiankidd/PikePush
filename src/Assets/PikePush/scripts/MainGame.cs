@@ -6,11 +6,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using PikePush.UI;
+using PikePush.Controls;
 
 namespace PikePush {
 
     public class MainGame : MonoBehaviour
     {
+        [SerializeField]
+        private ControlsManager controlsManager;
+
         public static MainGame instance;
 
         // Reference to the message box UI
@@ -162,6 +166,9 @@ namespace PikePush {
             // Determine if the game is active
             bool gameActive = (gameStarted && !gameOver);
 
+            // get inputs
+            ControlsManager.Controls activeControls = this.controlsManager.InputCheck();
+
             if (gameActive)
             {
                 // Handle logic during an active fight
@@ -202,7 +209,7 @@ namespace PikePush {
             else
             {
                 // Start the game if the player presses Space
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (activeControls.HasFlag(ControlsManager.Controls.Space))
                 {
                     messageBox.Close();
                     this.StartGame();
@@ -210,8 +217,10 @@ namespace PikePush {
             }
 
             // Handle quitting the game
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (activeControls.HasFlag(ControlsManager.Controls.Escape))
             {
+                Debug.Log($"[MainGame][Update]Quitting game");
+                Debug.Log(activeControls);
                 this.QuitGame();
             }
         }
