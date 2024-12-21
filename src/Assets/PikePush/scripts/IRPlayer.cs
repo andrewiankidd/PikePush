@@ -11,9 +11,7 @@ namespace PikePush {
 
     public class IRPlayer : MonoBehaviour
     {
-        public ButtonControlsSimple GestureControlsSimple;
-        public ButtonControlsSimple ButtonControlsSimple;
-        public ButtonControlsSimple TouchControlsSimple;
+        [SerializeField]
         private ControlsManager controlsManager;
 
         public static float gravity = 20.0f;
@@ -26,14 +24,6 @@ namespace PikePush {
         Vector3 defaultScale;
         bool crouching = false;
 
-        public void Awake()
-        {
-            this.GestureControlsSimple = GameObject.FindObjectsOfType<ButtonControlsSimple>(true).First(o => o.name == "GestureControlsSimple");
-            this.ButtonControlsSimple = GameObject.FindObjectsOfType<ButtonControlsSimple>(true).First(o => o.name == "ButtonControlsSimple");
-            this.TouchControlsSimple = GameObject.FindObjectsOfType<ButtonControlsSimple>(true).First(o => o.name == "TouchControlsSimple");
-            controlsManager = new ControlsManager();
-        }
-
         // Start is called before the first frame update
         public void Start()
         {
@@ -42,60 +32,13 @@ namespace PikePush {
             r.freezeRotation = true;
             r.useGravity = false;
             defaultScale = transform.localScale;
-
-            // todo lol
-            string touchControlsDropdown = PlayerPrefs.GetString("TouchControlsDropdown");
-            Debug.Log($"[IRPlayer][Update]TouchControlsDropdown: {touchControlsDropdown}");
-
-            this.GestureControlsSimple.gameObject.SetActive(false);
-            this.ButtonControlsSimple.gameObject.SetActive(false);
-            this.TouchControlsSimple.gameObject.SetActive(false);
-            if (touchControlsDropdown == "1")
-            {
-                this.GestureControlsSimple.gameObject.SetActive(true);
-            }
-            else if (touchControlsDropdown == "2")
-            {
-                this.ButtonControlsSimple.gameObject.SetActive(true);
-            }
-            else if (touchControlsDropdown == "3")
-            {
-                this.TouchControlsSimple.gameObject.SetActive(true);
-            }
         }
 
         public void Update()
         {
             #region control checks
-            ControlsManager.Controls activeControls = ControlsManager.Controls.Idle;
-
-            activeControls = this.controlsManager.InputCheck(this.GestureControlsSimple, activeControls);
-            activeControls = this.controlsManager.InputCheck(this.ButtonControlsSimple, activeControls);
-            activeControls = this.controlsManager.InputCheck(this.TouchControlsSimple, activeControls);
-
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                Debug.Log("[IRPlayer][Update][Controls.Up]");
-                activeControls |= ControlsManager.Controls.Up;
-            }
-            else if (Input.GetKey(KeyCode.S))
-            {
-                Debug.Log("[IRPlayer][Update][Controls.Down]");
-                activeControls |= ControlsManager.Controls.Down;
-            }
-            if (Input.GetKey(KeyCode.A))
-            {
-                Debug.Log("[IRPlayer][Update][Controls.Left]");
-                activeControls |= ControlsManager.Controls.Left;
-            }
-            else if (Input.GetKey(KeyCode.D))
-            {
-                Debug.Log("[IRPlayer][Update][Controls.Right]");
-                activeControls |= ControlsManager.Controls.Right;
-            }
+            ControlsManager.Controls activeControls = this.controlsManager.InputCheck();
             #endregion
-
-            // Debug.Log($"activeControls: {activeControls.HasFlag(Controls.Left)}");
 
             #region game controls
             if (grounded) {

@@ -24,6 +24,8 @@ namespace PikePush.Controls {
         public bool Right { get; set; } = false;
         public bool Up { get; set; } = false;
         public bool Down { get; set; } = false;
+        public bool Space { get; set; } = false;
+        public bool Escape { get; set; } = false;
 
         public object this[string controlName]
         {

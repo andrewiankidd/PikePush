@@ -6,11 +6,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using PikePush.UI;
+using PikePush.Controls;
 
 namespace PikePush {
 
     public class MainGame : MonoBehaviour
     {
+        [SerializeField]
+        private ControlsManager controlsManager;
+
         public static MainGame instance;
 
         // Reference to the message box UI
@@ -162,6 +166,9 @@ namespace PikePush {
             // Determine if the game is active
             bool gameActive = (gameStarted && !gameOver);
 
+            // get inputs
+            ControlsManager.Controls activeControls = this.controlsManager.InputCheck();
+
             if (gameActive)
             {
                 // Handle logic during an active fight
@@ -202,7 +209,7 @@ namespace PikePush {
             else
             {
                 // Start the game if the player presses Space
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (activeControls.HasFlag(ControlsManager.Controls.Space))
                 {
                     messageBox.Close();
                     this.StartGame();
@@ -210,8 +217,10 @@ namespace PikePush {
             }
 
             // Handle quitting the game
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (activeControls.HasFlag(ControlsManager.Controls.Escape))
             {
+                Debug.Log($"[MainGame][Update]Quitting game");
+                Debug.Log(activeControls);
                 this.QuitGame();
             }
         }
@@ -254,7 +263,7 @@ namespace PikePush {
                 );
                 msg.onClick.AddListener(() =>
                 {
-                    Debug.Log("[MessageBox][StartGame]");
+                    Debug.Log("[OnGUI][MessageBox][StartGame]");
                     this.StartGame();
                 });
             }
@@ -269,24 +278,10 @@ namespace PikePush {
             );
             msg.onClick.AddListener(() =>
             {
+                Debug.Log("[GameOver][MessageBox][StartGame]");
                 this.StartGame();
             });
         }
-
-        // // Centers a UI element on the screen
-        // private Rect Centered(string message, float horizontalMargin = 0f, float verticalMargin = 0f, float horizontalPadding = 2.0f, float verticalPadding = 2.0f)
-        // {
-        //     GUIContent content = new GUIContent(message);
-        //     Vector2 size = labelStyle.CalcSize(content);
-        //     float labelWidth = horizontalPadding * size.x;
-        //     float labelHeight = verticalPadding * size.y;
-        //     return new Rect(
-        //         (Screen.width / 2) - (labelWidth / 2),
-        //         horizontalMargin,
-        //         labelWidth,
-        //         labelHeight
-        //     );
-        // }
 
         // Parses a color from a string format "R,G,B"
         private Color ParseColourFromString(string colourString)

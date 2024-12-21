@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using PikePush.Controls;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,9 @@ namespace PikePush.UI {
 
     public class MessageBox : MonoBehaviour
     {
+        [SerializeField]
+        private ControlsManager controlsManager;
+
         public TMPro.TMP_Text TitleLabel;
         public TMPro.TMP_Text MessageLabel;
         public Button SpaceButton;

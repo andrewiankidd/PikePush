@@ -16,29 +16,20 @@ using UnityEngine.UI;
 
 namespace PikePush.Controls {
 
-    public class ButtonControlsSimple : MonoBehaviour
+    public class TouchControlsSimple : ControlScheme
     {
-
-        // Instantiate the Controls class
-        public ControlInputs controls = new ControlInputs();
-
-        public bool Enabled(bool state)
-        {
-            Debug.Log($"Enabled: {state}");
-            return state;
-        }
 
         // Method called on pointer down event
         public void OnPointerDown(BaseEventData eventData)
         {
-            Debug.Log($"OnPointerDown: {eventData.selectedObject.name}");
+            Debug.Log($"[TouchControlsSimple][OnPointerDown]: {eventData.selectedObject.name}");
             this.controls[eventData.selectedObject.name] = true;
         }
 
         // Method called on pointer up event
         public void OnPointerUp(BaseEventData eventData)
         {
-            Debug.Log($"OnPointerUp: {eventData.selectedObject.name}");
+            Debug.Log($"[TouchControlsSimple][OnPointerUp]: {eventData.selectedObject.name}");
             this.controls[eventData.selectedObject.name] = false;
         }
 

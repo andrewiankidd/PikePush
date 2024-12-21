@@ -21,7 +21,7 @@ namespace PikePush.Menus {
             // TouchControlsDropdown
             TouchControlsDropdown = GameObject.Find("TouchControlsDropdown").GetComponent<TMPro.TMP_Dropdown>();
             // TouchControlsDropdown.options.Clear();
-            foreach (string controlOption in Controls.ControlsManager.ControlSchemes)
+            foreach (string controlOption in Controls.ControlsManager.controlSchemes)
             {
                 Debug.Log($"[SettingsMenuManager][Awake]controlOption: {controlOption}");
                 TouchControlsDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData(){ text = controlOption });

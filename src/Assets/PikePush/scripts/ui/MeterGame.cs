@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using PikePush.Controls;
 
 namespace PikePush.UI {
 
     public class MeterGame : MonoBehaviour
     {
+        [SerializeField]
+        private ControlsManager controlsManager;
+
         // UI element to represent the meter
         [SerializeField] private Image meterFill; // Image used for the meter
         [SerializeField] private Text meterPercentageText; // Text to show the percentage
@@ -46,8 +50,10 @@ namespace PikePush.UI {
             if (!this.gameObject.activeInHierarchy)
                 return;
 
-            // Check if the space key is pressed
-            if (Input.GetKeyDown(KeyCode.Space))
+            // get inputs
+            ControlsManager.Controls activeControls = this.controlsManager.InputCheck();
+
+            if (activeControls.HasFlag(ControlsManager.Controls.Space))
             {
                 IncreaseMeter(fillRate);
             }
