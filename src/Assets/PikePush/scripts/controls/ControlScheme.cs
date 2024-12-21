@@ -1,9 +1,5 @@
-﻿using System;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine;
+using PikePush.Utls;
 
 namespace PikePush.Controls
 {
@@ -14,7 +10,7 @@ namespace PikePush.Controls
 
         public bool Enabled(bool state)
         {
-            Debug.Log($"Enabled: {state}");
+            LogHelper.debug($"Enabled: {state}");
             return state;
         }
     }

@@ -6,6 +6,8 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using PikePush.Utls;
+
 
 namespace PikePush.Menus {
 
@@ -97,12 +99,12 @@ namespace PikePush.Menus {
         }
 
         private byte[] ParseImageFromString(string textureString) {
-            Debug.Log("ParseImageFromString: " + textureString);
+            LogHelper.debug("ParseImageFromString: " + textureString);
             return Convert.FromBase64String(textureString);
         }
 
         private Color ParseColourFromString(string colourString) {
-            Debug.Log("ParseColourFromString: " + colourString);
+            LogHelper.debug("ParseColourFromString: " + colourString);
             byte[] colourValues = Array.ConvertAll(colourString.Split(','), byte.Parse);
             return new Color32(colourValues[0], colourValues[1], colourValues[2], 255);
         }

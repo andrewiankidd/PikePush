@@ -1,18 +1,5 @@
-using System;
-using System.Reflection;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using System;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using System;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
+using PikePush.Utls;
 
 namespace PikePush.Controls {
 
@@ -21,67 +8,43 @@ namespace PikePush.Controls {
 
         public void Update()
         {
+            this.controls = new ControlInputs();
+            LogHelper.debug("[ExternalControlsSimple][Update]");
+
             if (Input.GetKeyDown(KeyCode.W))
             {
-                Debug.Log("[ExternalControlsSimple][Update][W]");
+                LogHelper.debug("[ExternalControlsSimple][Update][W]");
                 this.controls.Up = true;
-            }
-            else
-            {
-                this.controls.Up = false;
-
             }
 
             if (Input.GetKey(KeyCode.S))
             {
-                Debug.Log("[ExternalControlsSimple][Update][S]");
+                LogHelper.debug("[ExternalControlsSimple][Update][S]");
                 this.controls.Down = true;
-            }
-            else
-            {
-                this.controls.Down = false;
-
             }
 
             if (Input.GetKey(KeyCode.A))
             {
-                Debug.Log("[ExternalControlsSimple][Update][A]");
+                LogHelper.debug("[ExternalControlsSimple][Update][A]");
                 this.controls.Left = true;
-            }
-            else
-            {
-                this.controls.Left = false;
-
             }
 
             if (Input.GetKey(KeyCode.D))
             {
-                Debug.Log("[ExternalControlsSimple][Update][D]");
+                LogHelper.debug("[ExternalControlsSimple][Update][D]");
                 this.controls.Right = true;
-            }
-            else
-            {
-                this.controls.Right = false;
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Debug.Log("[ExternalControlsSimple][Update][Esc]");
+                LogHelper.debug("[ExternalControlsSimple][Update][Esc]");
                 this.controls.Escape = true;
-            }
-            else
-            {
-                this.controls.Escape = false;
             }
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                Debug.Log("[ExternalControlsSimple][Update][Space]");
+                LogHelper.debug("[ExternalControlsSimple][Update][Space]");
                 this.controls.Space = true;
-            }
-            else
-            {
-                this.controls.Space = false;
             }
 
         }

@@ -1,19 +1,6 @@
 
 using System;
 using System.Reflection;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using System;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using System;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
 namespace PikePush.Controls {
 
     // Encapsulate the Controls class within GestureControlsSimple

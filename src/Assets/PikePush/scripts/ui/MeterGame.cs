@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using PikePush.Controls;
+using PikePush.Utls;
+
 
 namespace PikePush.UI {
 
@@ -35,7 +35,7 @@ namespace PikePush.UI {
                 this.ResetGame();
                 this.gameObject.SetActive(true);
             }
-            Debug.Log($"[MeterGame][Show]");
+            LogHelper.debug($"[MeterGame][Show]");
 
             tcs = new TaskCompletionSource<bool>();
             bool result = await tcs.Task;
@@ -64,7 +64,7 @@ namespace PikePush.UI {
 
             // Update the UI elements
             UpdateUI();
-            Debug.Log($"[MeterGame][Update]: {meterValue}");
+            LogHelper.debug($"[MeterGame][Update]: {meterValue}");
 
             // Check if the player has failed (meter reaches 0)
             if (IsMeterEmpty())
@@ -82,19 +82,19 @@ namespace PikePush.UI {
         {
             if (meterFill != null)
             {
-                Debug.Log($"[MeterGame][UpdateUI][meterFill]: {meterValue}");
+                LogHelper.debug($"[MeterGame][UpdateUI][meterFill]: {meterValue}");
                 meterFill.fillAmount = meterValue; // For Image-based representation
             }
 
             if (meterPercentageText != null)
             {
-                Debug.Log($"[MeterGame][UpdateUI][meterPercentageText]: {meterValue}");
+                LogHelper.debug($"[MeterGame][UpdateUI][meterPercentageText]: {meterValue}");
                 meterPercentageText.text = $"{(int)(meterValue * 100)}%"; // Show percentage
             }
 
             if (meterSlider != null)
             {
-                Debug.Log($"[MeterGame][UpdateUI][meterSlider]: {meterValue}");
+                LogHelper.debug($"[MeterGame][UpdateUI][meterSlider]: {meterValue}");
                 meterSlider.value = meterValue; // For Slider-based representation
             }
         }
@@ -102,7 +102,7 @@ namespace PikePush.UI {
         // Called when the player fails
         private void OnSuccess()
         {
-            Debug.Log("[MeterGame][OnSuccess]");
+            LogHelper.debug("[MeterGame][OnSuccess]");
             tcs.SetResult(true);
             this.gameObject.SetActive(false);
         }
@@ -110,7 +110,7 @@ namespace PikePush.UI {
         // Called when the player fails
         private void OnFail()
         {
-            Debug.Log("[MeterGame][OnFail]");
+            LogHelper.debug("[MeterGame][OnFail]");
             tcs.SetResult(false);
             this.gameObject.SetActive(false);
         }
@@ -136,7 +136,7 @@ namespace PikePush.UI {
         {
             if (!IsMeterEmpty())
             {
-                Debug.Log($"[MeterGame][DecreaseMeter] '{amount}'");
+                LogHelper.debug($"[MeterGame][DecreaseMeter] '{amount}'");
                 meterValue -= amount % Time.deltaTime;
             }
 
