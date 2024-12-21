@@ -9,6 +9,10 @@ This is basically just a ten minute runner game written in Unity, but with some 
 - customize flag!
 - customize colors!
 - run!
+- crouch! (slows the game down)
+- dodge obstacles!
+- fight enemies!
+- play with button, touch, gesture, or external controls!
 
 ### Links
 <p align="center">
