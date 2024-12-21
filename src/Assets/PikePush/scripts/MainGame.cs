@@ -263,7 +263,7 @@ namespace PikePush {
                 );
                 msg.onClick.AddListener(() =>
                 {
-                    Debug.Log("[MessageBox][StartGame]");
+                    Debug.Log("[OnGUI][MessageBox][StartGame]");
                     this.StartGame();
                 });
             }
@@ -278,24 +278,10 @@ namespace PikePush {
             );
             msg.onClick.AddListener(() =>
             {
+                Debug.Log("[GameOver][MessageBox][StartGame]");
                 this.StartGame();
             });
         }
-
-        // // Centers a UI element on the screen
-        // private Rect Centered(string message, float horizontalMargin = 0f, float verticalMargin = 0f, float horizontalPadding = 2.0f, float verticalPadding = 2.0f)
-        // {
-        //     GUIContent content = new GUIContent(message);
-        //     Vector2 size = labelStyle.CalcSize(content);
-        //     float labelWidth = horizontalPadding * size.x;
-        //     float labelHeight = verticalPadding * size.y;
-        //     return new Rect(
-        //         (Screen.width / 2) - (labelWidth / 2),
-        //         horizontalMargin,
-        //         labelWidth,
-        //         labelHeight
-        //     );
-        // }
 
         // Parses a color from a string format "R,G,B"
         private Color ParseColourFromString(string colourString)
