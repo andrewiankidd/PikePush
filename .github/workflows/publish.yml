@@ -274,6 +274,7 @@ jobs:
         run: |
           cp CHANGELOG.md .github/pages/
           cp README.md .github/pages/
+          cp -r docs .github/pages/docs
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
