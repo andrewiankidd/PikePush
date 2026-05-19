@@ -21,7 +21,12 @@ namespace PikePush.Menus {
         }
 
         public void GameStart() {
-            SceneManager.LoadScene("Game");
+            var modeSelect = FindAnyObjectByType<ModeSelectOverlay>();
+            if (modeSelect == null) {
+                var go = new GameObject("ModeSelectOverlay");
+                modeSelect = go.AddComponent<ModeSelectOverlay>();
+            }
+            modeSelect.Show();
         }
 
         public void GameCustomize() {
@@ -30,6 +35,15 @@ namespace PikePush.Menus {
 
         public void GameSettings() {
             SceneManager.LoadScene("SettingsMenu");
+        }
+
+        public void GameCredits() {
+            var overlay = FindAnyObjectByType<CreditsOverlay>();
+            if (overlay == null) {
+                var go = new GameObject("CreditsOverlay");
+                overlay = go.AddComponent<CreditsOverlay>();
+            }
+            overlay.Show();
         }
 
         public void GameQuit() {

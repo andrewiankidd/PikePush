@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/PikePush/Scenes/Game.unity
     guid: 235708c8e7f9a6b4dada292af87e144d
+  - enabled: 1
+    path: Assets/PikePush/Scenes/Drill.unity
+    guid: d1a7e5fbb3c91f04d8e7a9b1c2d3e4f5
   m_configObjects: {}
