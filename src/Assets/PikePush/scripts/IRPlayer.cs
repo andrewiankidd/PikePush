@@ -47,7 +47,7 @@ namespace PikePush {
                 if (activeControls.HasFlag(ControlsManager.Controls.Up))
                 {
                     LogHelper.debug("[IRPlayer][Update][Jump]");
-                    r.velocity = new Vector3(r.velocity.x, CalculateJumpVerticalSpeed(), r.velocity.z);
+                    r.linearVelocity = new Vector3(r.linearVelocity.x, CalculateJumpVerticalSpeed(), r.linearVelocity.z);
                 }
                 else {
                     if (activeControls.HasFlag(ControlsManager.Controls.Down))
