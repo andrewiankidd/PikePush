@@ -1,18 +1,16 @@
-
 # PikePush
 ##### _A Dumb Lil Runner Game_
 
 ## About
-This is basically just a ten minute runner game written in Unity, but with some niche flavouring 🌶️
+**PikePush** is a ten-minute runner game built in Unity, with some niche flavouring 🌶️. Customize your flag, customize your colors, run, dodge obstacles, and fight enemies — all in one sitting.
 
 ## Features
-- customize flag!
-- customize colors!
-- run!
-- crouch! (slows the game down)
-- dodge obstacles!
-- fight enemies!
-- play with button, touch, gesture, or external controls!
+- 🏳️ Customize your flag — bring your own colors
+- 🎨 Customize player colors
+- 🏃 Run, dodge obstacles, fight enemies
+- 🐢 Crouch to slow the game down
+- 🎮 Button, touch, gesture, or external controller input
+- ⏱️ Ten-minute runs — one sitting, no commitment
 
 ### Links
 <p align="center">
@@ -25,7 +23,7 @@ This is basically just a ten minute runner game written in Unity, but with some 
     <a href="https://andrewiankidd.github.io/PikePush/WebGL/index.html">
         <img src="https://img.shields.io/badge/%f0%9f%8c%90%20Browser-cadetblue.svg" />
     </a>
-    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/Linux-release.zip">
+    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/StandaloneLinux64-release.zip">
         <img src="https://img.shields.io/badge/Linux-cadetblue.svg?logo=linux" />
     </a>
     <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/StandaloneWindows64-release.zip">
@@ -50,6 +48,14 @@ This is basically just a ten minute runner game written in Unity, but with some 
     <a href="https://github.com/andrewiankidd/PikePush/actions/workflows/publish.yml">
         <img src="https://github.com/andrewiankidd/PikePush/actions/workflows/publish.yml/badge.svg" />
     </a>
-    <br>
+</p>
+
+## Screenshot
+
+<p align="center">
     <img src="https://github.com/andrewiankidd/PikePush/raw/master/assets/screencap.gif" width="100%">
 </p>
+
+## License
+
+See the `LICENSE` file for details.

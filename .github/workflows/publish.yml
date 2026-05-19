@@ -259,25 +259,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Read ReadMe.md
-        id: mdRead
-        uses: juliangruber/read-file-action@v1.1.4
-        with:
-          path: 'ReadMe.md'
-
-      - name: get repository name
-        run: echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
-
-      - uses: cschleiden/replace-tokens@v1
-        with:
-          tokenPrefix: '{{'
-          tokenSuffix: '}}'
-          files: '[".github/pages/**/*.html"]'
-        env:
-          USER: ${{ github.repository_owner }}
-          PROJECT: ${{ env.REPOSITORY_NAME }}
-          MARKDOWN: ${{ steps.mdRead.outputs.content }}
-
       - name: Download WebGL Build
         uses: robinraju/release-downloader@v1.8
         with:
