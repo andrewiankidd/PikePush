@@ -9,9 +9,9 @@ on:
       - master
 
 env:
-  UNITY_MAJOR_VERSION: 2022
-  UNITY_MINOR_VERSION: 2
-  UNITY_PATCH_VERSION: 17f1
+  UNITY_MAJOR_VERSION: 6000
+  UNITY_MINOR_VERSION: 4
+  UNITY_PATCH_VERSION: 7f1
 
 jobs:
   prepare_release:
@@ -184,10 +184,10 @@ jobs:
 
       # Cache
       - name: 🗃️ Caching
-        uses: actions/cache@v1.1.0
+        uses: actions/cache@v4
         with:
           path: src/Library
-          key: src/Library-${{ matrix.targetPlatform }}
+          key: src/Library-${{ matrix.targetPlatform }}-${{ env.UNITY_MAJOR_VERSION }}.${{ env.UNITY_MINOR_VERSION }}.${{ env.UNITY_PATCH_VERSION }}
 
       # Create build path
       - name: 📁 Create the build path
