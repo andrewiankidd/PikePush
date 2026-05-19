@@ -270,6 +270,11 @@ jobs:
         run: |
           mv WebGL/WebGL .github/pages
 
+      - name: Stage markdown sources for changelog.html / docs.html
+        run: |
+          cp CHANGELOG.md .github/pages/
+          cp README.md .github/pages/
+
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
