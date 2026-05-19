@@ -81,11 +81,64 @@
         }
         header nav a:hover { border-bottom: 1px solid var(--highlight); color: var(--highlight); }
 
-        main.wiki-content {
-            color: var(--text);
+        .wiki-layout {
+            display: flex;
             width: 90%;
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto 40px;
+            gap: 20px;
+        }
+        @media (max-width: 800px) {
+            .wiki-layout { flex-direction: column; width: 95%; }
+            .sidebar { order: -1; }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: var(--foreground);
+            border-radius: var(--radius);
+            padding: 20px;
+            align-self: flex-start;
+            position: sticky;
+            top: 20px;
+        }
+        .sidebar h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 0.8rem;
+        }
+        .sidebar ul { list-style: none; }
+        .sidebar li { margin-bottom: 0.4rem; }
+        .sidebar a {
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.3rem 0.5rem;
+            display: block;
+            border-radius: 3px;
+            transition: background 0.15s;
+        }
+        .sidebar a:hover { background: var(--card); color: var(--highlight); }
+        .sidebar a.active { background: var(--highlight); color: var(--background); }
+        .sidebar .nav-section {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-top: 1rem;
+            margin-bottom: 0.3rem;
+            padding: 0 0.5rem;
+            font-weight: 700;
+        }
+
+        /* Content */
+        .wiki-content {
+            flex: 1;
+            min-width: 0;
             background: var(--foreground);
             border-radius: var(--radius);
             padding: 40px;
@@ -113,13 +166,6 @@
             margin-top: 1.5rem;
             margin-bottom: 0.5rem;
         }
-        .wiki-content h5 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--muted);
-            margin-bottom: 1rem;
-            font-style: italic;
-        }
         .wiki-content p {
             line-height: 1.7;
             margin-bottom: 1rem;
@@ -146,7 +192,22 @@
             border: 1px solid var(--border);
         }
         .wiki-content pre code { background: none; padding: 0; }
-        .wiki-content img { max-width: 100%; border-radius: var(--radius); }
+        .wiki-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .wiki-content th, .wiki-content td {
+            text-align: left;
+            padding: 0.5rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .wiki-content th {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--muted);
+        }
         .wiki-content blockquote {
             border-left: 3px solid var(--highlight);
             padding: 0.5rem 1rem;
@@ -155,11 +216,7 @@
             background: var(--card);
             border-radius: 0 var(--radius) var(--radius) 0;
         }
-
-        @media (max-width: 700px) {
-            main.wiki-content { padding: 20px; width: 95%; }
-            header { padding: 20px; flex-direction: column; gap: 10px; }
-        }
+        .wiki-content img { max-width: 100%; border-radius: var(--radius); }
     </style>
 </head>
 <body>
@@ -173,11 +230,53 @@
         </nav>
     </header>
 
-    <main class="wiki-content" id="content" role="main">
-        <p>Loading...</p>
-    </main>
+    <div class="wiki-layout">
+        <aside class="sidebar">
+            <h3>Docs</h3>
+            <ul id="nav-list"></ul>
+        </aside>
+        <main class="wiki-content" id="content" role="main">
+            <p>Loading...</p>
+        </main>
+    </div>
 
     <script>
+        // Wiki page registry — drives the sidebar AND slug → file resolution.
+        // Sections: { section: "Label", pages: [ [slug, label, path], ... ] }
+        // Pages:    [slug, label, path]   — path relative to docs/, no .md
+        var sections = [
+            { section: "", pages: [
+                ["index", "Home"],
+            ]},
+            { section: "Playing", pages: [
+                ["controls", "Controls", "playing/controls"],
+                ["modes", "Modes", "playing/modes"],
+                ["runner", "Runner Mode", "playing/runner"],
+                ["drill", "Drill Mode", "playing/drill"],
+            ]},
+            { section: "Customization", pages: [
+                ["customize", "Soldier & Flag", "customization/index"],
+            ]},
+            { section: "Development", pages: [
+                ["project", "Project Structure", "development/project"],
+                ["scripts", "Scripts Overview", "development/scripts"],
+                ["build", "Build & CI", "development/build"],
+            ]},
+            { section: "Project", pages: [
+                ["credits", "Credits", "project/credits"],
+            ]},
+        ];
+
+        var slugToPath = {};
+        var pathToSlug = {};
+        sections.forEach(function(s) {
+            s.pages.forEach(function(p) {
+                var filePath = p[2] || p[0];
+                slugToPath[p[0]] = filePath;
+                pathToSlug[filePath] = p[0];
+            });
+        });
+
         function toggleLightMode() {
             document.body.classList.toggle("light");
             localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
@@ -186,20 +285,91 @@
             document.body.classList.add("light");
         }
 
-        // PikePush has a single source of docs — the repo README. Fetch and
-        // render it through marked so the HTML formatting (shields block,
-        // screenshot) stays intact.
-        fetch("README.md")
-            .then(function(r) {
-                if (!r.ok) throw new Error("Not found");
-                return r.text();
-            })
-            .then(function(md) {
-                document.getElementById("content").innerHTML = marked.parse(md);
-            })
-            .catch(function() {
-                document.getElementById("content").innerHTML = "<h1>Docs</h1><p>README not available yet.</p>";
+        // Build sidebar nav.
+        var navList = document.getElementById("nav-list");
+        sections.forEach(function(s) {
+            if (s.section) {
+                var heading = document.createElement("li");
+                heading.className = "nav-section";
+                heading.textContent = s.section;
+                navList.appendChild(heading);
+            }
+            s.pages.forEach(function(p) {
+                var li = document.createElement("li");
+                var a = document.createElement("a");
+                a.href = "#" + p[0];
+                a.dataset.slug = p[0];
+                a.onclick = (function(slug) {
+                    return function(e) { e.preventDefault(); loadPage(slug); };
+                })(p[0]);
+                a.textContent = p[1];
+                li.appendChild(a);
+                navList.appendChild(li);
             });
+        });
+
+        // Resolve a markdown link href (possibly relative) to a docs/ path.
+        function resolveLink(href, currentPath) {
+            var clean = href.replace(/\.md(#.*)?$/, "");
+            var base = currentPath.indexOf("/") !== -1
+                ? currentPath.substring(0, currentPath.lastIndexOf("/"))
+                : "";
+            var parts = (base ? base + "/" + clean : clean).split("/");
+            var resolved = [];
+            parts.forEach(function(p) {
+                if (p === "." || p === "") return;
+                if (p === "..") { resolved.pop(); return; }
+                resolved.push(p);
+            });
+            return resolved.join("/");
+        }
+
+        function loadPage(slug) {
+            var currentPath = slugToPath[slug] || slug;
+            var url = "docs/" + currentPath + ".md";
+            fetch(url)
+                .then(function(r) {
+                    if (!r.ok) throw new Error("Not found");
+                    return r.text();
+                })
+                .then(function(md) {
+                    // Rewrite intra-wiki .md links to hash-routed navigation.
+                    md = md.replace(/\[([^\]]+)\]\(([^)]+\.md(?:#[^)]*)?)\)/g, function(match, label, href) {
+                        var resolved = resolveLink(href, currentPath);
+                        var targetSlug = pathToSlug[resolved];
+                        if (targetSlug) {
+                            return '<a href="#' + targetSlug + '" onclick="event.preventDefault();loadPage(\'' + targetSlug + '\')">' + label + '</a>';
+                        }
+                        return match;
+                    });
+                    // Rewrite local image paths to be relative to docs/.
+                    md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, src) {
+                        if (src.startsWith("http") || src.startsWith("/")) return match;
+                        var base = currentPath.indexOf("/") !== -1
+                            ? currentPath.substring(0, currentPath.lastIndexOf("/"))
+                            : "";
+                        var fullSrc = base ? "docs/" + base + "/" + src : "docs/" + src;
+                        return "![" + alt + "](" + fullSrc + ")";
+                    });
+                    document.getElementById("content").innerHTML = marked.parse(md);
+                    document.querySelectorAll(".sidebar a").forEach(function(a) {
+                        a.classList.toggle("active", a.dataset && a.dataset.slug === slug);
+                    });
+                    window.location.hash = slug;
+                    window.scrollTo(0, 0);
+                })
+                .catch(function() {
+                    document.getElementById("content").innerHTML = "<h1>Not Found</h1><p>Page not available yet.</p>";
+                });
+        }
+
+        var initial = window.location.hash.replace("#", "") || "index";
+        loadPage(initial);
+
+        window.addEventListener("hashchange", function() {
+            var slug = window.location.hash.replace("#", "") || "index";
+            loadPage(slug);
+        });
     </script>
 </body>
 </html>

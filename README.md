@@ -1,16 +1,16 @@
 # PikePush
-##### _A Dumb Lil Runner Game_
+##### _Started as a dumb lil runner game. Scope crept._
 
 ## About
-**PikePush** is a ten-minute runner game built in Unity, with some niche flavouring 🌶️. Customize your flag, customize your colors, run, dodge obstacles, and fight enemies — all in one sitting.
+**PikePush** was meant to be a dumb lil ten-minute runner — and it mostly still is, that loop lives on as the **Runner** mode. A **Drill** mode for commanding pikeman formations snuck in alongside it, and there's room for more. Built in Unity 6. Customize your flag, customize your colours, then run, dodge, and fight — or fall back and just push some blocks around the parade ground.
 
 ## Features
-- 🏳️ Customize your flag — bring your own colors
-- 🎨 Customize player colors
-- 🏃 Run, dodge obstacles, fight enemies
+- 🏃 **Runner mode** — the original ten-minute dash: dodge obstacles, fight enemies, get faster as you go
+- ⚔️ **Drill mode** — pick a block of pikemen, issue commands, watch the formation respond
+- 🏳️ Hand-drawn flag customization
+- 🎨 Customize hat + torso colours
 - 🐢 Crouch to slow the game down
-- 🎮 Button, touch, gesture, or external controller input
-- ⏱️ Ten-minute runs — one sitting, no commitment
+- 🎮 Button, touch, gesture, or keyboard input — switchable from Settings
 
 ### Links
 <p align="center">
