@@ -1,0 +1,61 @@
+# PikePush
+##### _A Dumb Lil Runner Game_
+
+## About
+**PikePush** is a ten-minute runner game built in Unity, with some niche flavouring 🌶️. Customize your flag, customize your colors, run, dodge obstacles, and fight enemies — all in one sitting.
+
+## Features
+- 🏳️ Customize your flag — bring your own colors
+- 🎨 Customize player colors
+- 🏃 Run, dodge obstacles, fight enemies
+- 🐢 Crouch to slow the game down
+- 🎮 Button, touch, gesture, or external controller input
+- ⏱️ Ten-minute runs — one sitting, no commitment
+
+### Links
+<p align="center">
+    <a href="https://andrewiankidd.github.io/PikePush/">
+        <img src="https://img.shields.io/badge/%E2%9A%94%EF%B8%8F%20PikePush-lightblue.svg" height="50" target="_blank" />
+    </a>
+    <br>
+    <strong>Play:</strong>
+    <br>
+    <a href="https://andrewiankidd.github.io/PikePush/WebGL/index.html">
+        <img src="https://img.shields.io/badge/%f0%9f%8c%90%20Browser-cadetblue.svg" />
+    </a>
+    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/StandaloneLinux64-release.zip">
+        <img src="https://img.shields.io/badge/Linux-cadetblue.svg?logo=linux" />
+    </a>
+    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/StandaloneWindows64-release.zip">
+        <img src="https://img.shields.io/badge/Windows-cadetblue.svg?logo=windows" />
+    </a>
+    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/StandaloneOSX-release.zip">
+        <img src="https://img.shields.io/badge/MacOS-cadetblue.svg?logo=macos" />
+    </a>
+    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/Android-release.zip">
+        <img src="https://img.shields.io/badge/Android-cadetblue.svg?logo=android" />
+    </a>
+    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/iOS-release.zip">
+        <img src="https://img.shields.io/badge/iOS-cadetblue.svg?logo=ios" />
+    </a>
+    <br>
+    <strong>Source Code:</strong>
+    <br>
+    <a href="https://github.com/andrewiankidd/PikePush">
+        <img src="https://img.shields.io/badge/GitHub-cadetblue.svg?logo=gitHub" />
+    </a>
+    <br>
+    <a href="https://github.com/andrewiankidd/PikePush/actions/workflows/publish.yml">
+        <img src="https://github.com/andrewiankidd/PikePush/actions/workflows/publish.yml/badge.svg" />
+    </a>
+</p>
+
+## Screenshot
+
+<p align="center">
+    <img src="https://github.com/andrewiankidd/PikePush/raw/master/assets/screencap.gif" width="100%">
+</p>
+
+## License
+
+See the `LICENSE` file for details.
