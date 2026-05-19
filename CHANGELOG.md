@@ -4,7 +4,7 @@ Public changelog for PikePush.
 
 ## Unreleased
 
-- Web template migrated to the shared TinnedSpaghetti / TWANGA style — hero, downloads, features grid, dark/light toggle, wave header, dual-host hooks for a future Cloudflare leg.
+- Web template rewritten — hero, downloads, features grid, dark/light toggle, animated wave header, dual-host hooks for a future Cloudflare leg.
 - Standalone Changelog and Docs pages added to the website nav.
 
 ## 2026-05

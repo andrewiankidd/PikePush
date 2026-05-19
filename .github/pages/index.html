@@ -347,12 +347,14 @@
     </footer>
 
     <script>
-        // Dual-host template pattern, copied from tinnedspaghetti. PikePush
-        // is GitHub-Pages-only today, but the template hooks stay so a
-        // Cloudflare leg can drop in later: tag elements with
-        // `.github-only` (hidden on Cloudflare) or `.cloudflare-only`
-        // (hidden on GitHub), and `data-download` links auto-flip between
-        // GitHub Releases and `/downloads/<file>` paths.
+        // Dual-host template hooks. PikePush is GitHub-Pages-only today,
+        // but the script keeps the github-only / cloudflare-only class
+        // gates and the `data-download` rewriting so a Cloudflare leg can
+        // drop in later without HTML edits:
+        //   - elements with `.github-only` are hidden on Cloudflare,
+        //     `.cloudflare-only` ones are hidden on GitHub,
+        //   - `[data-download]` anchors auto-flip between
+        //     `releases/latest/download/<file>` and `/downloads/<file>`.
         var isGitHub = window.location.hostname.indexOf("github.io") !== -1;
         if (isGitHub) {
             document.querySelectorAll(".cloudflare-only").forEach(function(el) {

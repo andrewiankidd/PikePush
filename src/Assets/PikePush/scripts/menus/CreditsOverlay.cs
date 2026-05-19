@@ -19,7 +19,6 @@ namespace PikePush.Menus
 
         const string DefaultCreditsBody =
 @"<b>PikePush</b>
-A game by Andrew Kidd
 
 <b>Dedicated to</b>
 The Earl of Loudoun's Regiment of Foote
