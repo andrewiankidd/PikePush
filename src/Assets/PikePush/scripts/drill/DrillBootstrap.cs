@@ -19,12 +19,11 @@ namespace PikePush.Drill
         const float MinContactRadius = 5f;
 
         // HUD stacking constants.
-        const float HudPerSideHeight = 110f;   // each MeterGame slider strip
-        const float HudPairSpacing   = 12f;    // gap between friendly/enemy bars within a pair
+        const float HudPerSideHeight = 180f;   // each MeterGame strip on screen
+        const float HudPairSpacing   = 8f;     // gap between friendly/enemy bars within a pair
         const float HudEngagementGap = 24f;    // gap between engagement pairs
         const float HudBaseY         = 140f;   // bottom edge of stack, sits above the command panel
-        static readonly Color FriendlyHudColor = new Color(0.30f, 0.65f, 0.95f);
-        static readonly Color EnemyHudColor    = new Color(0.95f, 0.35f, 0.35f);
+        const string MeterGamePrefabResourcePath = "MeterGame";
 
         [Header("Field")]
         [SerializeField] Color fieldColor = new Color(0.30f, 0.55f, 0.20f);
@@ -61,6 +60,7 @@ namespace PikePush.Drill
         BlockCountPanel enemyPanel;
         Canvas hudCanvas;
         Font uiFont;
+        GameObject meterGamePrefab;
 
         public IReadOnlyList<Engagement> Engagements => engagements;
 
@@ -81,6 +81,15 @@ namespace PikePush.Drill
 
             selector = EnsureSelector(cam);
             EnsureCommandPanel(hudCanvas, selector);
+
+            meterGamePrefab = Resources.Load<GameObject>(MeterGamePrefabResourcePath);
+            if (meterGamePrefab == null)
+            {
+                LogHelper.warn(
+                    "[DrillBootstrap] MeterGame prefab not found at Resources/MeterGame. " +
+                    "Run PikePush > Regenerate MeterGame Prefab from Runner to extract it from Game.unity. " +
+                    "Engagements will run logically but with no HUD.");
+            }
 
             friendlyPanel = BlockCountPanel.Build(hudCanvas.transform, uiFont,
                 "Friendly", new Color(0.6f, 0.8f, 1f),
@@ -238,26 +247,33 @@ namespace PikePush.Drill
             RepositionHuds();
         }
 
-        // Each engagement gets two MeterGame instances (one per side), reusing
-        // the same mash-bar UI the runner shows. Friendly bar on top, enemy
-        // beneath. Multiple engagements stack vertically.
+        // Each engagement gets two MeterGame instances — instantiated from the
+        // exact same prefab the runner uses — one bound to each side's meter.
+        // Friendly bar on top, enemy beneath. Multiple engagements stack
+        // vertically above the command panel.
         void SpawnHud(Engagement eng)
         {
-            if (hudCanvas == null) return;
-            var f = MeterGame.BuildDynamic(hudCanvas.transform, uiFont, eng.A.label, eng.MeterA, FriendlyHudColor);
-            var e = MeterGame.BuildDynamic(hudCanvas.transform, uiFont, eng.B.label, eng.MeterB, EnemyHudColor);
-            // The dynamic build sets a default sizeDelta meant for full-size
-            // runner display. Shrink to fit a stacked HUD strip.
-            ResizeForStack(f);
-            ResizeForStack(e);
+            if (hudCanvas == null || meterGamePrefab == null) return;
+            var f = InstantiateHud(eng.A.label, eng.MeterA);
+            var e = InstantiateHud(eng.B.label, eng.MeterB);
             huds[eng] = new EngagementHud { Friendly = f, Enemy = e };
         }
 
-        static void ResizeForStack(MeterGame mg)
+        MeterGame InstantiateHud(string title, MeterModel model)
         {
-            if (mg == null) return;
-            var rt = (RectTransform)mg.transform;
-            rt.sizeDelta = new Vector2(720f, HudPerSideHeight);
+            var go = Object.Instantiate(meterGamePrefab, hudCanvas.transform, false);
+            go.name = $"MeterGame_{title}";
+            go.SetActive(true);
+
+            var mg = go.GetComponent<MeterGame>();
+            if (mg == null)
+            {
+                LogHelper.warn("[DrillBootstrap] MeterGame prefab missing MeterGame component — regenerate it");
+                return null;
+            }
+            mg.BindExternal(model);
+            mg.SetTitle(title);
+            return mg;
         }
 
         void DestroyHud(Engagement eng)
