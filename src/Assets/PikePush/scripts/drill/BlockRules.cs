@@ -6,6 +6,7 @@ namespace PikePush.Drill
         public SpacingOrder Spacing;
         public bool IsWheeling;
         public bool IsMarching;
+        public bool IsEngaged;
     }
 
     public static class BlockRules
@@ -19,17 +20,28 @@ namespace PikePush.Drill
             if (cmd == DrillCommand.Halt) return true;
 
             // Posture changes are always allowed — they're the way out of any
-            // locked state (incl. ChargeForHorse).
+            // locked state (incl. ChargeForHorse) and the strategic dial during
+            // an engagement (e.g. ChargeYourPike mid-push).
             if (IsPosture(cmd)) return true;
 
             bool braced = state.Posture == PikePosture.ChargeForHorse;
             bool closest = state.Spacing == SpacingOrder.Closest;
             bool wheeling = state.IsWheeling;
+            bool engaged = state.IsEngaged;
 
             // While bracing, the block is committed to its anti-cavalry stance.
             // No movement, no facing, no spacing changes — only re-posture or halt.
             if (braced)
                 return false;
+
+            // Engaged: spacing changes still allowed (form Closest Order to push
+            // back harder), but no movement, no facings, no wheeling. You're
+            // locked in pike-to-pike until the meter resolves.
+            if (engaged)
+            {
+                if (IsSpacing(cmd)) return true;
+                return false;
+            }
 
             // Facings rotate the whole formation 90/180. Pikes at Closest spacing
             // would clash; wheeling already controls yaw.

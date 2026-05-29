@@ -140,13 +140,17 @@ namespace PikePush.Drill
 
         void RemoveBlock(Block block)
         {
-            // Drop any engagements this block is part of, then the selector,
-            // then the GameObject. Dangling state must not outlive the block.
+            // Drop any engagements this block is part of, unlocking the other
+            // side. Then the selector, then the GameObject. Dangling state
+            // must not outlive the block.
             for (int i = engagements.Count - 1; i >= 0; i--)
             {
                 var eng = engagements[i];
-                if (eng.A == block || eng.B == block)
-                    engagements.RemoveAt(i);
+                if (eng.A != block && eng.B != block) continue;
+
+                var other = eng.A == block ? eng.B : eng.A;
+                if (other != null) other.IsEngaged = false;
+                engagements.RemoveAt(i);
             }
             if (selector != null) selector.Remove(block);
             if (block != null) Destroy(block.gameObject);
@@ -186,8 +190,12 @@ namespace PikePush.Drill
         void StartEngagement(Block f, Block e)
         {
             LogHelper.debug($"[DrillBootstrap] ENGAGEMENT: {f.label} vs {e.label}");
+            // Halt before flipping IsEngaged so the Halt command isn't gated
+            // by the engagement lock that's about to come up.
             f.Issue(DrillCommand.Halt);
             e.Issue(DrillCommand.Halt);
+            f.IsEngaged = true;
+            e.IsEngaged = true;
             engagements.Add(new Engagement(f, e));
         }
 
@@ -253,7 +261,10 @@ namespace PikePush.Drill
         {
             LogHelper.debug($"[DrillBootstrap] WINNER: {eng.Winner?.label}  loser: {eng.Loser?.label}");
 
-            // The loser breaks — remove from the field. The winner stays put.
+            // Winner unlocks first — order matters because RemoveBlock can
+            // strip the loser from the rosters and selector.
+            if (eng.Winner != null) eng.Winner.IsEngaged = false;
+
             var loser = eng.Loser;
             if (loser != null)
             {

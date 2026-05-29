@@ -13,7 +13,15 @@ namespace PikePush.Tests.Drill
                 Spacing = SpacingOrder.Order,
                 IsWheeling = false,
                 IsMarching = false,
+                IsEngaged = false,
             };
+        }
+
+        static BlockState EngagedState()
+        {
+            var s = DefaultState();
+            s.IsEngaged = true;
+            return s;
         }
 
         [Test]
@@ -134,6 +142,35 @@ namespace PikePush.Tests.Drill
         }
 
         [Test]
+        public void Engaged_BlocksMovementAndFacings()
+        {
+            // Once a block is in push-of-pike contact, it can't walk away
+            // or pivot. The only sane orders are Halt, posture changes,
+            // spacing changes (closer for push power, looser for breaks),
+            // and Reform.
+            var s = EngagedState();
+            Assert.IsFalse(BlockRules.AllowsCommand(DrillCommand.ForwardMarch, s));
+            Assert.IsFalse(BlockRules.AllowsCommand(DrillCommand.MarchOn, s));
+            Assert.IsFalse(BlockRules.AllowsCommand(DrillCommand.RightHandWheel, s));
+            Assert.IsFalse(BlockRules.AllowsCommand(DrillCommand.LeftHandWheel, s));
+            Assert.IsFalse(BlockRules.AllowsCommand(DrillCommand.RightHandFace, s));
+            Assert.IsFalse(BlockRules.AllowsCommand(DrillCommand.LeftHandAboutFace, s));
+            Assert.IsFalse(BlockRules.AllowsCommand(DrillCommand.Countermarch, s));
+        }
+
+        [Test]
+        public void Engaged_AllowsHaltAndPostureAndSpacing()
+        {
+            var s = EngagedState();
+            Assert.IsTrue(BlockRules.AllowsCommand(DrillCommand.Halt, s));
+            Assert.IsTrue(BlockRules.AllowsCommand(DrillCommand.AdvanceYourPike, s));
+            Assert.IsTrue(BlockRules.AllowsCommand(DrillCommand.ChargeYourPike, s));
+            Assert.IsTrue(BlockRules.AllowsCommand(DrillCommand.ClosestOrder, s));
+            Assert.IsTrue(BlockRules.AllowsCommand(DrillCommand.CloseOrder, s));
+            Assert.IsTrue(BlockRules.AllowsCommand(DrillCommand.Reform, s));
+        }
+
+        [Test]
         public void ReformAlwaysAllowed()
         {
             // Reform is the panic button — should never be gated out.
@@ -148,6 +185,9 @@ namespace PikePush.Tests.Drill
             var wheeling = DefaultState();
             wheeling.IsWheeling = true;
             Assert.IsTrue(BlockRules.AllowsCommand(DrillCommand.Reform, wheeling));
+
+            var engaged = EngagedState();
+            Assert.IsTrue(BlockRules.AllowsCommand(DrillCommand.Reform, engaged));
         }
     }
 }

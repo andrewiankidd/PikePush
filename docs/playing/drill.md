@@ -77,6 +77,12 @@ to it will drain. To push two engagements at once you have to either
 multi-select (shift-click both sides of a fight, or one block from each
 of two fights) or cycle selection between them.
 
+Once engaged, a block is **locked in** — Halt, Posture changes,
+Spacing changes, and Reform are still legal (and the spacing dial is
+how you outmuscle the other side via the counter-matrix), but Forward
+March, Wheel, Facings, Doublings, and Countermarch all grey out until
+the engagement resolves.
+
 First meter to fill (Won) declares its block the winner; the loser
 breaks and is removed from the field. First meter to drain to zero
 (Lost) declares the *other* block the winner. The block-count panels

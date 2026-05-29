@@ -33,6 +33,10 @@ namespace PikePush.Drill
         public SpacingOrder Spacing { get; private set; } = SpacingOrder.Order;
         public bool IsWheeling { get; private set; }
         public bool IsBracing => Posture == PikePosture.ChargeForHorse;
+        // Set by the engagement system (DrillBootstrap / future Campaign). When
+        // true, AllowsCommand locks out movement and facings — you can only
+        // change posture or spacing, halt, or reform.
+        public bool IsEngaged { get; set; }
 
         public float GoalYawDegrees { get; private set; }
         public float CurrentYawDegrees { get; private set; }
@@ -44,6 +48,7 @@ namespace PikePush.Drill
             Spacing = Spacing,
             IsWheeling = IsWheeling,
             IsMarching = IsMarching,
+            IsEngaged = IsEngaged,
         };
 
         float targetSpacingMultiplier = 1f;
