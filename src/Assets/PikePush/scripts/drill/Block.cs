@@ -24,6 +24,10 @@ namespace PikePush.Drill
         [SerializeField] public GameObject soldierPrefab;
         [SerializeField] public Color soldierColor = new Color(0.65f, 0.55f, 0.40f);
 
+        [Header("Faction")]
+        [SerializeField] public Faction faction = Faction.Friendly;
+        public Faction Faction => faction;
+
         public bool IsMarching { get; private set; }
         public PikePosture Posture { get; private set; } = PikePosture.Order;
         public SpacingOrder Spacing { get; private set; } = SpacingOrder.Order;

@@ -269,12 +269,18 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   fieldColor: {r: 0.30, g: 0.55, b: 0.20, a: 1}
   fieldSize: 80
-  initialBlockCount: 1
+  initialFriendlyBlockCount: 1
+  initialEnemyBlockCount: 0
   ranks: 4
   files: 4
   soldierPrefab: {fileID: 4634498319579514372, guid: a3f7b2e9c4d8e1f5a6b9c0d4e7f3a8b5, type: 3}
-  blockColors:
-  - {r: 0.75, g: 0.30, b: 0.30, a: 1}
+  friendlyPalette:
   - {r: 0.30, g: 0.45, b: 0.85, a: 1}
   - {r: 0.85, g: 0.75, b: 0.30, a: 1}
   - {r: 0.40, g: 0.75, b: 0.45, a: 1}
+  - {r: 0.65, g: 0.55, b: 0.40, a: 1}
+  enemyPalette:
+  - {r: 0.75, g: 0.20, b: 0.20, a: 1}
+  - {r: 0.55, g: 0.15, b: 0.35, a: 1}
+  - {r: 0.45, g: 0.20, b: 0.45, a: 1}
+  - {r: 0.85, g: 0.45, b: 0.20, a: 1}

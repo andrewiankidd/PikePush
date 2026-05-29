@@ -45,9 +45,28 @@ e.g. while braced for cavalry the block is committed to its stance.
 
 ## Adding and removing blocks
 
-A small **+ / −** panel in the top-right corner controls how many blocks
-are on the field, clamped between **1 and 4**. New blocks spawn at a
-sensible default position; the button greys out when the limit is hit.
+Two **+ / −** panels in the top-right corner control how many blocks
+are on the field per faction:
+
+- **Friendly** — 1 to 4 blocks. Always at least one.
+- **Enemy** — 0 to 4 blocks. Optional; stand up an opposing force to
+  spar against.
+
+Friendly blocks spawn facing north; enemy blocks spawn facing south.
+Each side has its own colour palette (Covenanter blues / mustards on
+your side, Royalist reds / burgundies on theirs).
+
+## Spar mode
+
+The moment you spawn any enemy blocks, drill mode is in **spar mode** —
+the field has two opposing forces and you can command either by clicking
+to select. There's no AI; the player controls every block on the field.
+
+When a friendly block and an enemy block come into contact, both halt
+and an `ENGAGEMENT` log fires. In a future build that contact triggers
+the same `MeterGame` (push-of-pike mash) used in runner / campaign;
+today it just stops the blocks so you can verify positioning and
+faction colours.
 
 ## Commands
 

@@ -45,14 +45,14 @@ These are answered and not up for re-litigation while V1 is in flight.
 
 ## Drill mode
 
-### Drill spar mode  *(V1)*
-Drill mode currently spawns friendly blocks only. Add an "Enemy" toggle
-when spawning so the player can stand up a second force and command
-both. No AI involved — the player controls every block on the field via
-selection. If a friendly block and an enemy block come into contact a
-`MeterGame` triggers as it would in Runner / Campaign. This is the
-sandbox for testing the formation counter-matrix and command gating
-without needing the full Campaign scenario layer.
+### Wire a real MeterGame to spar-mode engagements
+Drill spar mode now spawns opposing factions and detects contact between
+friendly and enemy blocks, but the engagement is a stub — both blocks
+just halt and the contact gets logged. The real "Push of Pike" wiring
+needs the existing `MeterGame` extracted from its single-instance shape
+so multiple meters can run in parallel (one per engaged pair). That's
+the same work as **Campaign V1 → Multi-block field battles
+(architecture)** — landing it there delivers spar mode for free.
 
 ### Drill command — remaining visual / movement work
 

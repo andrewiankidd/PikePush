@@ -9,29 +9,45 @@ namespace PikePush.Drill
 {
     public class DrillBootstrap : MonoBehaviour
     {
-        public const int MinBlocks = 1;
-        public const int MaxBlocks = 4;
+        public const int MinFriendlyBlocks = 1;
+        public const int MaxBlocksPerFaction = 4;
         const float BlockSpacingX = 8f;
+        const float FriendlyZ = -10f;
+        const float EnemyZ = 10f;
+        const float MinContactRadius = 5f;
 
         [Header("Field")]
         [SerializeField] Color fieldColor = new Color(0.30f, 0.55f, 0.20f);
         [SerializeField] float fieldSize = 80f;
 
         [Header("Blocks")]
-        [SerializeField] int initialBlockCount = 1;
+        [SerializeField] int initialFriendlyBlockCount = 1;
+        [SerializeField] int initialEnemyBlockCount = 0;
         [SerializeField] int ranks = 4;
         [SerializeField] int files = 4;
         [SerializeField] GameObject soldierPrefab;
-        [SerializeField] Color[] blockColors = {
-            new Color(0.75f, 0.30f, 0.30f),
-            new Color(0.30f, 0.45f, 0.85f),
-            new Color(0.85f, 0.75f, 0.30f),
-            new Color(0.40f, 0.75f, 0.45f),
+
+        [Header("Palettes")]
+        [SerializeField] Color[] friendlyPalette = {
+            new Color(0.30f, 0.45f, 0.85f), // Covenanter blue
+            new Color(0.85f, 0.75f, 0.30f), // mustard
+            new Color(0.40f, 0.75f, 0.45f), // sage
+            new Color(0.65f, 0.55f, 0.40f), // hodden grey-brown
+        };
+        [SerializeField] Color[] enemyPalette = {
+            new Color(0.75f, 0.20f, 0.20f), // royalist red
+            new Color(0.55f, 0.15f, 0.35f), // burgundy
+            new Color(0.45f, 0.20f, 0.45f), // plum
+            new Color(0.85f, 0.45f, 0.20f), // ochre
         };
 
-        readonly List<Block> spawnedBlocks = new List<Block>();
+        readonly List<Block> friendly = new List<Block>();
+        readonly List<Block> enemy = new List<Block>();
+        readonly HashSet<(Block, Block)> engaged = new HashSet<(Block, Block)>();
+
         BlockSelector selector;
-        BlockCountPanel countPanel;
+        BlockCountPanel friendlyPanel;
+        BlockCountPanel enemyPanel;
         Font uiFont;
 
         void Awake()
@@ -45,53 +61,122 @@ namespace PikePush.Drill
 
             selector = EnsureSelector(cam);
             EnsureCommandPanel(canvas, selector);
-            countPanel = EnsureBlockCountPanel(canvas);
 
-            int n = Mathf.Clamp(initialBlockCount, MinBlocks, MaxBlocks);
-            for (int i = 0; i < n; i++) SpawnBlock();
-            countPanel.Refresh();
+            friendlyPanel = BlockCountPanel.Build(canvas.transform, uiFont,
+                "Friendly", new Color(0.6f, 0.8f, 1f),
+                new Vector2(-20f, -20f),
+                () => friendly.Count, SpawnFriendly, RemoveLastFriendly,
+                MinFriendlyBlocks, MaxBlocksPerFaction);
+
+            enemyPanel = BlockCountPanel.Build(canvas.transform, uiFont,
+                "Enemy", new Color(1f, 0.6f, 0.6f),
+                new Vector2(-20f, -86f),
+                () => enemy.Count, SpawnEnemy, RemoveLastEnemy,
+                0, MaxBlocksPerFaction);
+
+            int nF = Mathf.Clamp(initialFriendlyBlockCount, MinFriendlyBlocks, MaxBlocksPerFaction);
+            for (int i = 0; i < nF; i++) SpawnFriendly();
+
+            int nE = Mathf.Clamp(initialEnemyBlockCount, 0, MaxBlocksPerFaction);
+            for (int i = 0; i < nE; i++) SpawnEnemy();
+
+            friendlyPanel.Refresh();
+            enemyPanel.Refresh();
         }
 
-        public int BlockCount => spawnedBlocks.Count;
-
-        public void SpawnBlock()
+        void Update()
         {
-            if (spawnedBlocks.Count >= MaxBlocks) return;
+            DetectEngagements();
+        }
 
-            int index = spawnedBlocks.Count;
-            var go = new GameObject($"Block_{index + 1}");
-            go.transform.position = SpawnPositionForIndex(index);
+        public int FriendlyCount => friendly.Count;
+        public int EnemyCount => enemy.Count;
+
+        public void SpawnFriendly() => Spawn(friendly, Faction.Friendly, friendlyPalette, FriendlyZ, yaw: 0f);
+        public void SpawnEnemy()    => Spawn(enemy,    Faction.Enemy,    enemyPalette,    EnemyZ,    yaw: 180f);
+
+        public void RemoveLastFriendly() { if (friendly.Count > MinFriendlyBlocks) RemoveLast(friendly); }
+        public void RemoveLastEnemy()    { if (enemy.Count > 0)                     RemoveLast(enemy); }
+
+        void Spawn(List<Block> roster, Faction faction, Color[] palette, float z, float yaw)
+        {
+            if (roster.Count >= MaxBlocksPerFaction) return;
+
+            int index = roster.Count;
+            string label = $"{faction} {index + 1}";
+            var go = new GameObject(label.Replace(' ', '_'));
+            go.transform.position = new Vector3((index - (MaxBlocksPerFaction - 1) * 0.5f) * BlockSpacingX, 0f, z);
+            go.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
 
             var block = go.AddComponent<Block>();
             block.ranks = ranks;
             block.files = files;
-            block.label = $"Block {index + 1}";
+            block.label = label;
             block.soldierPrefab = soldierPrefab;
-            block.soldierColor = blockColors[index % blockColors.Length];
-            spawnedBlocks.Add(block);
-            LogHelper.debug($"[DrillBootstrap] Spawned {block.label} (total={spawnedBlocks.Count})");
+            block.soldierColor = palette[index % palette.Length];
+            block.faction = faction;
+
+            roster.Add(block);
+            LogHelper.debug($"[DrillBootstrap] Spawned {label} (faction total={roster.Count})");
         }
 
-        public void RemoveLastBlock()
+        void RemoveLast(List<Block> roster)
         {
-            if (spawnedBlocks.Count <= MinBlocks) return;
+            int last = roster.Count - 1;
+            if (last < 0) return;
 
-            int last = spawnedBlocks.Count - 1;
-            var block = spawnedBlocks[last];
-            spawnedBlocks.RemoveAt(last);
+            var block = roster[last];
+            roster.RemoveAt(last);
 
+            // Cleanup: drop the block from any active engagement pair and from
+            // the selector so dangling state doesn't outlive it.
+            engaged.RemoveWhere(p => p.Item1 == block || p.Item2 == block);
             if (selector != null) selector.Remove(block);
             if (block != null) Destroy(block.gameObject);
-            LogHelper.debug($"[DrillBootstrap] Removed last block (remaining={spawnedBlocks.Count})");
+            LogHelper.debug($"[DrillBootstrap] Removed last block (remaining={roster.Count})");
         }
 
-        Vector3 SpawnPositionForIndex(int index)
+        void DetectEngagements()
         {
-            // Fan out symmetrically around origin so the camera frames the army cleanly
-            // as it grows. We re-derive every block's intended slot on each spawn rather
-            // than re-positioning existing blocks (which would be jarring at runtime).
-            float x = (index - (MaxBlocks - 1) * 0.5f) * BlockSpacingX;
-            return new Vector3(x, 0f, 0f);
+            // O(N*M) over the two rosters. With both capped at 4 this is at
+            // most 16 checks per frame — well under polling budget.
+            for (int i = 0; i < friendly.Count; i++)
+            {
+                var f = friendly[i];
+                if (f == null) continue;
+                for (int j = 0; j < enemy.Count; j++)
+                {
+                    var e = enemy[j];
+                    if (e == null) continue;
+
+                    var pair = (f, e);
+                    bool inContact = FactionContact.InContact(f, e, MinContactRadius);
+                    if (inContact && engaged.Add(pair))
+                    {
+                        OnEngagementStarted(f, e);
+                    }
+                    else if (!inContact && engaged.Remove(pair))
+                    {
+                        OnEngagementEnded(f, e);
+                    }
+                }
+            }
+        }
+
+        // V1 stub. The real wiring spins up a MeterGame instance per engaged
+        // pair; that work lives in docs/backlog.md under "Multi-block field
+        // battles (architecture)" since it needs MeterGame extracted from its
+        // current single-instance shape.
+        void OnEngagementStarted(Block f, Block e)
+        {
+            LogHelper.debug($"[DrillBootstrap] ENGAGEMENT: {f.label} vs {e.label}");
+            f.Issue(DrillCommand.Halt);
+            e.Issue(DrillCommand.Halt);
+        }
+
+        void OnEngagementEnded(Block f, Block e)
+        {
+            LogHelper.debug($"[DrillBootstrap] disengaged: {f.label} vs {e.label}");
         }
 
         void EnsureLighting()
@@ -214,16 +299,6 @@ namespace PikePush.Drill
             panel.Initialize(sel, layoutRect, uiFont);
 
             return panel;
-        }
-
-        BlockCountPanel EnsureBlockCountPanel(Canvas canvas)
-        {
-            var existing = FindAnyObjectByType<BlockCountPanel>();
-            if (existing != null) return existing;
-
-            return BlockCountPanel.Build(canvas.transform, uiFont,
-                () => spawnedBlocks.Count, SpawnBlock, RemoveLastBlock,
-                MinBlocks, MaxBlocks);
         }
 
         static Font DefaultUIFont()

@@ -1,16 +1,15 @@
 using System;
-using PikePush.Utls;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace PikePush.Drill.UI
 {
-    // The +/− panel for adding and removing blocks at runtime in Drill mode.
-    // Clamped 1..MaxBlocks by DrillBootstrap; the panel just disables the
-    // button at the boundaries.
+    // The +/− panel for adding and removing blocks at runtime. One instance
+    // per faction in Drill mode (Friendly + Enemy). Clamped by the caller;
+    // this panel just disables the +/− buttons at the boundaries.
     public class BlockCountPanel : MonoBehaviour
     {
+        string titleLabel = "Blocks";
         Text countText;
         Button addButton;
         Button removeButton;
@@ -21,18 +20,20 @@ namespace PikePush.Drill.UI
         int maxCount;
 
         public static BlockCountPanel Build(Transform canvasParent, Font font,
+            string title, Color titleColor,
+            Vector2 anchoredPosition,
             Func<int> getCount, Action onAdd, Action onRemove,
             int minCount, int maxCount)
         {
-            var go = new GameObject("BlockCountPanel");
+            var go = new GameObject($"BlockCountPanel_{title}");
             go.transform.SetParent(canvasParent, false);
 
             var rect = go.AddComponent<RectTransform>();
             rect.anchorMin = new Vector2(1f, 1f);
             rect.anchorMax = new Vector2(1f, 1f);
             rect.pivot = new Vector2(1f, 1f);
-            rect.anchoredPosition = new Vector2(-20f, -20f);
-            rect.sizeDelta = new Vector2(220f, 56f);
+            rect.anchoredPosition = anchoredPosition;
+            rect.sizeDelta = new Vector2(260f, 56f);
 
             var bg = go.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.55f);
@@ -47,6 +48,7 @@ namespace PikePush.Drill.UI
             layout.childForceExpandHeight = true;
 
             var panel = go.AddComponent<BlockCountPanel>();
+            panel.titleLabel = title;
             panel.minCount = minCount;
             panel.maxCount = maxCount;
             panel.getCount = getCount;
@@ -61,7 +63,7 @@ namespace PikePush.Drill.UI
                 panel.Refresh();
             });
 
-            panel.countText = BuildLabel(go.transform, font);
+            panel.countText = BuildLabel(go.transform, font, titleColor);
 
             panel.addButton = BuildButton(go.transform, font, "+");
             panel.addButton.onClick.AddListener(() =>
@@ -78,7 +80,7 @@ namespace PikePush.Drill.UI
         public void Refresh()
         {
             int n = getCount();
-            countText.text = $"Blocks: {n}";
+            countText.text = $"{titleLabel}: {n}";
             removeButton.interactable = n > minCount;
             addButton.interactable = n < maxCount;
         }
@@ -111,16 +113,16 @@ namespace PikePush.Drill.UI
             return btn;
         }
 
-        static Text BuildLabel(Transform parent, Font font)
+        static Text BuildLabel(Transform parent, Font font, Color color)
         {
             var go = new GameObject("Count");
             go.transform.SetParent(parent, false);
             var txt = go.AddComponent<Text>();
             txt.font = font;
             txt.alignment = TextAnchor.MiddleCenter;
-            txt.color = Color.white;
+            txt.color = color;
             txt.fontSize = 18;
-            txt.text = "Blocks: 1";
+            txt.text = "";
             txt.raycastTarget = false;
             return txt;
         }
