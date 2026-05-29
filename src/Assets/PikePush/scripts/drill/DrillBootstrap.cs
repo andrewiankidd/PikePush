@@ -85,10 +85,11 @@ namespace PikePush.Drill
             meterGamePrefab = Resources.Load<GameObject>(MeterGamePrefabResourcePath);
             if (meterGamePrefab == null)
             {
-                LogHelper.warn(
-                    "[DrillBootstrap] MeterGame prefab not found at Resources/MeterGame. " +
-                    "Run PikePush > Regenerate MeterGame Prefab from Runner to extract it from Game.unity. " +
-                    "Engagements will run logically but with no HUD.");
+                ShowFatalBanner(hudCanvas, uiFont,
+                    "MeterGame prefab missing\n\n" +
+                    "Run Unity menu:\nPikePush  ▸  Regenerate MeterGame Prefab from Runner\n\n" +
+                    "(should auto-generate on script reload — if you see this after a reload, the\n" +
+                    "Game.unity scene didn't yield a MeterGame GameObject and the generator logged an error)");
             }
 
             friendlyPanel = BlockCountPanel.Build(hudCanvas.transform, uiFont,
@@ -514,6 +515,44 @@ namespace PikePush.Drill
             panel.Initialize(sel, layoutRect, uiFont);
 
             return panel;
+        }
+
+        // Center-of-screen red banner for fatal-but-recoverable bootstrap
+        // issues (e.g. missing prefab). Silent warnings in the console are
+        // why iterating on this mode has been painful — make it loud.
+        static void ShowFatalBanner(Canvas canvas, Font font, string message)
+        {
+            LogHelper.warn($"[DrillBootstrap][FATAL] {message}");
+            if (canvas == null) return;
+
+            var go = new GameObject("DrillFatalBanner");
+            go.transform.SetParent(canvas.transform, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = new Vector2(960f, 320f);
+
+            var bg = go.AddComponent<Image>();
+            bg.color = new Color(0.55f, 0.08f, 0.08f, 0.96f);
+            bg.raycastTarget = false;
+
+            var textGo = new GameObject("Text");
+            textGo.transform.SetParent(go.transform, false);
+            var trt = textGo.AddComponent<RectTransform>();
+            trt.anchorMin = Vector2.zero;
+            trt.anchorMax = Vector2.one;
+            trt.offsetMin = new Vector2(24f, 24f);
+            trt.offsetMax = new Vector2(-24f, -24f);
+            var txt = textGo.AddComponent<Text>();
+            txt.font = font;
+            txt.fontSize = 26;
+            txt.fontStyle = FontStyle.Bold;
+            txt.color = Color.white;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.text = message;
+            txt.raycastTarget = false;
         }
 
         static Font DefaultUIFont()
