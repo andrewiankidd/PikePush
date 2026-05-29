@@ -14,6 +14,7 @@ namespace PikePush.Drill.UI
     public class EngagementOverviewPanel : MonoBehaviour
     {
         Font font;
+        Image background;
         Text text;
         IReadOnlyList<Engagement> source;
 
@@ -50,6 +51,7 @@ namespace PikePush.Drill.UI
 
             var panel = go.AddComponent<EngagementOverviewPanel>();
             panel.font = font;
+            panel.background = bg;
             panel.text = txt;
             panel.source = source;
             panel.SetVisible(false);
@@ -83,9 +85,14 @@ namespace PikePush.Drill.UI
         static string Label(Block b) => b != null ? b.label : "?";
         static string Percent(float v) => $"{Mathf.RoundToInt(v * 100f),3}%";
 
+        // Toggle the renderers, not the GameObject. Disabling the GameObject
+        // stops Update() from running, which is how the original version got
+        // stuck hidden on first frame and never reappeared when an engagement
+        // started.
         void SetVisible(bool visible)
         {
-            if (gameObject.activeSelf != visible) gameObject.SetActive(visible);
+            if (background != null) background.enabled = visible;
+            if (text != null) text.enabled = visible;
         }
     }
 }
