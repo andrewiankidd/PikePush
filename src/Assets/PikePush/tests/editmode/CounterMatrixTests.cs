@@ -69,5 +69,50 @@ namespace PikePush.Tests.Combat
             float d = CounterMatrix.FillRateMultiplier(PikePosture.ChargeForHorse, SpacingOrder.Closest, AttackType.PikePush);
             Assert.AreEqual(c, d);
         }
+
+        // --- Drain rate (defensive) tests --------------------------------
+
+        [Test]
+        public void DrainMultiplier_TightFormation_HoldsLonger()
+        {
+            // Closest Order should be more durable than Open Order under
+            // a pike-vs-pike push — that's the whole point of forming up tight.
+            float closest = CounterMatrix.DrainRateMultiplier(PikePosture.Order, SpacingOrder.Closest, AttackType.PikePush);
+            float close   = CounterMatrix.DrainRateMultiplier(PikePosture.Order, SpacingOrder.Close,   AttackType.PikePush);
+            float order   = CounterMatrix.DrainRateMultiplier(PikePosture.Order, SpacingOrder.Order,   AttackType.PikePush);
+            float open    = CounterMatrix.DrainRateMultiplier(PikePosture.Order, SpacingOrder.Open,    AttackType.PikePush);
+
+            Assert.Less(closest, close);
+            Assert.Less(close, order);
+            Assert.Less(order, open);
+            Assert.Less(closest, 1f);
+            Assert.Greater(open, 1f);
+        }
+
+        [Test]
+        public void DrainMultiplier_BracingVsCavalry_HoldsBest()
+        {
+            float braced  = CounterMatrix.DrainRateMultiplier(PikePosture.ChargeForHorse, SpacingOrder.Order, AttackType.CavalryCharge);
+            float regular = CounterMatrix.DrainRateMultiplier(PikePosture.Order,          SpacingOrder.Order, AttackType.CavalryCharge);
+            Assert.Less(braced, regular);
+            Assert.Less(braced, 1f);
+        }
+
+        [Test]
+        public void DrainMultiplier_BracingVsPikePush_BreaksFaster()
+        {
+            float braced  = CounterMatrix.DrainRateMultiplier(PikePosture.ChargeForHorse, SpacingOrder.Order, AttackType.PikePush);
+            float regular = CounterMatrix.DrainRateMultiplier(PikePosture.Order,          SpacingOrder.Order, AttackType.PikePush);
+            Assert.Greater(braced, regular);
+        }
+
+        [Test]
+        public void DrainMultiplier_DenseUnbracedVsCavalry_IsCatastrophic()
+        {
+            // Tight formations are food for cavalry if you haven't braced.
+            float closest = CounterMatrix.DrainRateMultiplier(PikePosture.Order, SpacingOrder.Closest, AttackType.CavalryCharge);
+            float open    = CounterMatrix.DrainRateMultiplier(PikePosture.Order, SpacingOrder.Open,    AttackType.CavalryCharge);
+            Assert.Greater(closest, open);
+        }
     }
 }

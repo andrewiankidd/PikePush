@@ -30,9 +30,12 @@ namespace PikePush.Drill
         {
             var col = b.GetComponent<BoxCollider>();
             if (col == null) return 0f;
-            // XZ-plane half-diagonal of the selection collider.
+            // Half the larger XZ side. The previous half-diagonal was bigger
+            // than the visual extent, so engagement fired with a noticeable
+            // gap between blocks. Using half-side keeps contact aligned with
+            // what the player sees touching.
             var size = col.size;
-            return Mathf.Sqrt(size.x * size.x + size.z * size.z) * 0.5f;
+            return Mathf.Max(size.x, size.z) * 0.5f;
         }
     }
 }

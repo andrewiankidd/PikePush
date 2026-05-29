@@ -17,11 +17,13 @@ namespace PikePush.Combat
     {
         public float Value { get; private set; }
         public float FillRate { get; set; } = 0.6f;
-        public float DrainRate { get; set; } = 0.35f;
+        public float DrainRate { get; set; } = 0.12f;
         public float StartValue { get; set; } = 0.5f;
-        // Counter-matrix hook: formation vs attacker modifies fill effectiveness.
-        // 1.0 = baseline; <1 = harder push; >1 = easier push.
+        // Counter-matrix hooks. 1.0 = baseline on both.
+        //   FillRateMultiplier  <1 = harder push;     >1 = easier push.
+        //   DrainRateMultiplier <1 = harder to budge; >1 = breaks easier.
         public float FillRateMultiplier { get; set; } = 1f;
+        public float DrainRateMultiplier { get; set; } = 1f;
 
         public MeterModel()
         {
@@ -48,7 +50,7 @@ namespace PikePush.Combat
             if (pushing)
                 Value = Mathf.Min(1f, Value + FillRate * FillRateMultiplier * dt);
             else
-                Value = Mathf.Max(0f, Value - DrainRate * dt);
+                Value = Mathf.Max(0f, Value - DrainRate * DrainRateMultiplier * dt);
         }
 
         public MeterResult Result

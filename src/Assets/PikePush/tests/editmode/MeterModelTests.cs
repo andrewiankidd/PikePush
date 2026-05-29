@@ -112,6 +112,38 @@ namespace PikePush.Tests.Combat
         }
 
         [Test]
+        public void DrainRateMultiplier_ScalesDrain()
+        {
+            var slow     = new MeterModel { FillRate = 0f, DrainRate = 1f, StartValue = 0.5f, DrainRateMultiplier = 0.5f };
+            var baseline = new MeterModel { FillRate = 0f, DrainRate = 1f, StartValue = 0.5f, DrainRateMultiplier = 1f  };
+            slow.Reset();
+            baseline.Reset();
+
+            slow.Tick(Dt, pushing: false);
+            baseline.Tick(Dt, pushing: false);
+
+            // Slower drain leaves more value on the meter after the same dt.
+            Assert.Greater(slow.Value, baseline.Value);
+            float slowLoss = 0.5f - slow.Value;
+            float baseLoss = 0.5f - baseline.Value;
+            Assert.AreEqual(0.5f * baseLoss, slowLoss, 0.0001f);
+        }
+
+        [Test]
+        public void DrainRateMultiplier_DoesNotAffectFill()
+        {
+            var slow     = new MeterModel { FillRate = 1f, DrainRate = 1f, StartValue = 0.5f, DrainRateMultiplier = 0.1f };
+            var baseline = new MeterModel { FillRate = 1f, DrainRate = 1f, StartValue = 0.5f, DrainRateMultiplier = 1f  };
+            slow.Reset();
+            baseline.Reset();
+
+            slow.Tick(Dt, pushing: true);
+            baseline.Tick(Dt, pushing: true);
+
+            Assert.AreEqual(baseline.Value, slow.Value, 0.0001f);
+        }
+
+        [Test]
         public void Reset_RestoresStartValue()
         {
             var m = new MeterModel { FillRate = 1f, StartValue = 0.5f };
