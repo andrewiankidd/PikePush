@@ -45,32 +45,6 @@ These are answered and not up for re-litigation while V1 is in flight.
 
 ## Drill mode
 
-### Add / remove blocks (1–4)  *(V1)*
-Drill currently spawns a fixed number of blocks (`DrillBootstrap.blockCount`,
-hardcoded to 1). Add `+` / `−` buttons to the drill UI that spawn or
-despawn blocks at runtime, clamped to **1 minimum, 4 maximum**.
-
-- New blocks spawn at a sensible default position (offset along X from
-  the existing blocks; auto-arrange so they don't overlap).
-- Removing a block destroys its `GameObject` and clears it from
-  `BlockSelector` if it was the active selection.
-- 4-block ceiling means `blockColors[]` needs a 4th entry; existing array
-  has 3.
-
-### Multi-block selection  *(V1)*
-Currently `BlockSelector` holds one selected block. Extend to a list:
-- **Click** clears selection and selects the clicked block (current behaviour).
-- **Shift-click** toggles the clicked block in/out of selection.
-- **Esc / click empty ground** clears selection.
-
-`DrillCommandPanel` issues the chosen command to every block in the
-selection. Visual treatment: outline ring per selected block (the
-existing single-block highlight, generalised). Land it in Drill mode
-first so it's exercised before Campaign needs it.
-
-Command gating with multi-select: a command is allowed iff **every**
-selected block allows it — disable the button otherwise.
-
 ### Drill spar mode  *(V1)*
 Drill mode currently spawns friendly blocks only. Add an "Enemy" toggle
 when spawning so the player can stand up a second force and command
@@ -80,114 +54,29 @@ selection. If a friendly block and an enemy block come into contact a
 sandbox for testing the formation counter-matrix and command gating
 without needing the full Campaign scenario layer.
 
-### Block command gating by formation state
-Add `Block.AllowsCommand(DrillCommand)` predicate. Disable in:
-- **Bracing** → Forward March, all Faces, all Order changes.
-- **Closest Order** → all Faces (pikes would clash at this spacing).
+### Drill command — remaining visual / movement work
 
-`DrillCommandPanel.Update()` polls per frame, calls
-`DrillCommandButton.SetInteractable(bool)` per button. Refactor
-`DrillCommandButton` onto Unity's `Selectable`/`Button` so the disabled
-visuals come for free.
+The data layer is landed: every command in the period manual has a state
+transition in `BlockRules` and a routed handler in `Block.Issue`. What's
+left is **visible behaviour**, which mostly belongs to the animation
+suite (see Engineering). What's still cheap to add here in Drill code:
 
-### Expand the drill command set
+- **Auto-dressings** — post-step a soldier forward into any hole in the
+  rank-in-front after facing changes. Pure slot bookkeeping.
+- **Wheeling pivot semantics** — currently a wheel just spins the whole
+  block. Real wheeling pivots about one corner (or the midst). Needs the
+  outside-file soldiers to traverse a wider arc than the inside-file.
+- **Doubling visual** — half-files and ranks visibly rearrange. Today
+  they only flip a (currently unused) state flag.
+- **Countermarch choreography** — front rank routes through the
+  formation to become the new rear. Three ground-keeping variants
+  determine where the block ends up.
+- **Form Circle** — outer ring at Charge for Horse, interior at Charge
+  Your Pike. Currently just a flat posture flag.
 
-The current ~10 commands are a tiny subset of period drill. Full manual
-at [glossary/drill-commands.md](glossary/drill-commands.md) — pikemen
-postures, spacing variants, inclines, split-faces, doublings,
-inversion/filing, countermarching, wheeling, reforms.
-
-**Implementation strategy:**
-1. Land the data layer first — extend `DrillCommand` enum and add
-   per-block state (`PikePosture`, doubled/inverted flags, etc.).
-2. Visible behaviour comes incrementally — ship as state-only stubs
-   first, animate later via the broader animation suite.
-3. UI scaling is a separate concern — see "Categorised command palette".
-
-**Status** — ✅ implemented · 🟡 partial · ⬜ pending. Remove items as
-they ship.
-
-#### Movement (2/2)
-- ✅ Halt
-- ✅ Forward March
-
-#### Pike postures (0/11) — needs `Block.PikePosture` enum + per-soldier pose state
-- ⬜ Order Your Pike
-- ⬜ Advance Your Pike
-- ⬜ Shoulder Your Pike
-- ⬜ Charge Your Pike *(rank-specific: front 2 ranks Charge, rest at Port)*
-- ⬜ Charge to the Rear *(scripted sequence: Advance → Left About Face → Charge)*
-- ⬜ Port / High Port
-- ⬜ Low Port Your Pike
-- ⬜ Shorten / Halve Your Pike
-- 🟡 Charge for Horse *(Y-scale crouch placeholder; rank-specific behaviour pending)*
-- ⬜ Form Circle *(outer ring: Charge for Horse; interior: Charge Your Pike)*
-- ⬜ Trail Your Pike
-
-#### Distancing (3/12)
-- ✅ Closest Order
-- ✅ Close Order
-- ⬜ Order *(currently default `1.0`, not addressable as command)*
-- ✅ Open Order
-- ⬜ Double Distance
-- ⬜ Twice Double Distance
-- ⬜ Bring Your Files to Open Order
-- ⬜ Bring Your Files to Open Order from the Left
-- ⬜ Bring Your Files to Open Order from the Midst
-- ⬜ Bring Your Ranks to Open Order
-- ⬜ Bring Your Ranks to Open Order from the Rear
-- ⬜ Ranks and Files to Open Order
-
-#### Facings (3/8)
-- ✅ Right Hand Face / Left Hand Face
-- ✅ Left Hand About Face
-- ✅ Right Hand About Face *(non-canonical — decide whether to keep)*
-- ⬜ Face to the Front
-- ⬜ Right Hand Incline *(on-march drift)*
-- ⬜ Left Hand Incline *(on-march drift)*
-- ⬜ Face to the Front and Rear
-- ⬜ Face to Both Flanks
-
-#### Dressings (0/1)
-- ⬜ Auto-step-forward to fill gaps *(post-step in `Block.Update()` after facing changes)*
-
-#### Doublings (0/13) — needs designated half-file leaders + multi-stage movement
-- ⬜ Half Files to the Left Double
-- ⬜ Half Files to the Right Double
-- ⬜ Half Files Recover
-- ⬜ By the Entire, Half Files to the Left Double
-- ⬜ By the Entire, Half Files to the Right Double
-- ⬜ By the Entire, Half Files to the Outwards Double
-- ⬜ Ranks to Right Double
-- ⬜ Ranks to Left Double
-- ⬜ Ranks Recover
-- ⬜ Bringers Up, Double the Frontage to the Left Hand
-- ⬜ Bringers Up, Double the Frontage to the Right Hand
-- ⬜ Bringers Up Recover
-- ⬜ By the Entire *(combined; deferred — complex)*
-
-#### Inversion / Filing On (0/6)
-- ⬜ Files, File On
-- ⬜ Double Files, File On
-- ⬜ Ranks, from the Left File On
-- ⬜ Ranks, from the Right File On
-- ⬜ Files to the Left Double
-- ⬜ Recover the Body *(reform from column)*
-
-#### Countermarching (0/3) — two-part orders: "Prepare to..." then "Countermarch"
-- ⬜ Prepare to Countermarch Maintaining Ground
-- ⬜ Prepare to Countermarch Losing Ground
-- ⬜ Prepare to Countermarch Gaining Ground
-
-#### Wheeling (0/5) — pivot while marching; resumed by "March On"
-- ⬜ Right Hand Wheel
-- ⬜ Left Hand Wheel
-- ⬜ Wheel about the Midst to the Right Hand
-- ⬜ Wheel about the Midst to the Left Hand
-- ⬜ March On *(resumes straight-line march after a wheel)*
-
-#### Reforms (0/1)
-- ⬜ Reform command *(Close Order + Advance Your Pike, gather stragglers)*
+All of these can wait until the animation suite is in flight — the data
+layer correctly gates and routes them, so the UI can be wired without
+visuals catching up first.
 
 ### Categorised command palette (submenu UI)
 The current flat horizontal bar won't scale past ~12 buttons. Restructure
