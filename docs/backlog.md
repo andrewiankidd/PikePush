@@ -375,38 +375,26 @@ the only controller in the project. Need a proper animation set:
 Could come from another Kevin Iglesias pack or be hand-authored. Either
 way it's the single biggest visual lift this project will take.
 
-### Centralise the runner's pikeman customisation
-`MainGame.Start()` has inline `HatMaterial.color` + `_CLOTH4COLOR` code
-that duplicates `PikemanCustomizer.Customize(pikeman, hatMaterial)`.
-Migrate the runner onto the customizer. Single source of truth, zero
-behaviour change.
-
 ### Tests
-Reinstate test coverage. Previous scaffolding was removed because Unity 6
-asmdefs can't reference `Assembly-CSharp`. Workaround: move the user
-source under an asmdef (`PikePush.Runtime`) so a `PikePush.Tests` asmdef
-can reference it cleanly. Cover at least:
-- `Block.AllowsCommand(...)` predicate (formation-gating logic)
-- `MeterGame` fill/drain math with various counter-matrix modifiers
-- `BattleScenario` deserialisation round-trip
+Scaffolding is back — `PikePush.Runtime` + `PikePush.Tests.EditMode`
+asmdefs are wired. Existing pure-logic coverage: `BlockRules.AllowsCommand`,
+`DrillCommandCatalog`, `FactionContact`, `MeterModel`, `Engagement`,
+`CounterMatrix`. Still to add:
+- `BattleScenario` deserialisation round-trip (once the scenario asset
+  exists)
 - Save round-trip (write → read → equal)
+- Edit-mode test for `Block.Issue` routing — currently we test the
+  predicate but not the state mutation it gates.
 
 Edit-mode tests for pure logic; Play-mode tests only where the
 behaviour needs the engine loop.
 
 ### KISS / DRY refactor pass (running, never "done")
 A standing item — not a one-shot task. When a system gains a second
-consumer, centralise it then and there rather than deferring. Examples
-already on the radar:
-- Pikeman customisation is consumed by Runner, Drill, and (incoming)
-  Campaign — see [[centralise-the-runners-pikeman-customisation]].
-- `MeterGame` will gain N-instance multi-block use; current single-block
-  assumptions need fishing out before they bite.
-- `BlockSelector` becomes multi-select; the existing single-block API
-  needs to disappear, not gain a parallel path.
-
-Carry duplication only when the second consumer hasn't materialised
-yet.
+consumer, centralise it then and there rather than deferring. Recent
+examples have all landed (`MeterModel` extraction, `BlockSelector`
+multi-select, `PikemanCustomizer` adoption in Runner). Carry duplication
+only when the second consumer hasn't materialised yet.
 
 ### Polytope Pikeman prefab — re-sync on Asset Store updates
 `Pikeman.prefab` is a full-copy of `PT_Male_Modular_Free_Pack` with

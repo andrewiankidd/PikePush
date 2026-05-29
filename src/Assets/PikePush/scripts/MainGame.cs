@@ -136,11 +136,16 @@ namespace PikePush {
                 spawnedTiles.Add(spawnedTile);
             }
 
-            // Character customization using saved preferences
-            this.HatMaterial.color = this.ParseColourFromString(PlayerPrefs.GetString("ColourOne", "93,165,255"));
-            GameObject.Find("PT_Male_Peasant_01_upper")
-                .GetComponent<Renderer>().sharedMaterial
-                .SetColor("_CLOTH4COLOR", this.ParseColourFromString(PlayerPrefs.GetString("ColourTwo", "145,156,168")));
+            // Character customization — single source of truth in PikemanCustomizer.
+            var upper = GameObject.Find("PT_Male_Peasant_01_upper");
+            if (upper != null)
+            {
+                PikemanCustomizer.Customize(upper.transform.root.gameObject, this.HatMaterial);
+            }
+            else
+            {
+                LogHelper.warn("[MainGame] PT_Male_Peasant_01_upper not found — skipping customisation");
+            }
         }
 
         // Recycles tiles when they move out of view
@@ -310,12 +315,5 @@ namespace PikePush {
 
         }
 
-        // Parses a color from a string format "R,G,B"
-        private Color ParseColourFromString(string colourString)
-        {
-            LogHelper.debug("ParseColourFromString: " + colourString);
-            byte[] colourValues = Array.ConvertAll(colourString.Split(','), byte.Parse);
-            return new Color32(colourValues[0], colourValues[1], colourValues[2], 255);
-        }
     }
 }
