@@ -63,10 +63,24 @@ the field has two opposing forces and you can command either by clicking
 to select. There's no AI; the player controls every block on the field.
 
 When a friendly block and an enemy block come into contact, both halt
-and an `ENGAGEMENT` log fires. In a future build that contact triggers
-the same `MeterGame` (push-of-pike mash) used in runner / campaign;
-today it just stops the blocks so you can verify positioning and
-faction colours.
+and an **Engagement** opens — two parallel push meters, one per block.
+The top-left overview lists every active engagement with both sides'
+meter percentages.
+
+| Input | Effect |
+|-------|--------|
+| Hold **Space** | Push for every block in your current selection. |
+| (no input on a block) | That block's meter drains. |
+
+Drill spar mode has no AI, so a block whose owner stops paying attention
+to it will drain. To push two engagements at once you have to either
+multi-select (shift-click both sides of a fight, or one block from each
+of two fights) or cycle selection between them.
+
+First meter to fill (Won) declares its block the winner; the loser
+breaks and is removed from the field. First meter to drain to zero
+(Lost) declares the *other* block the winner. The block-count panels
+refresh as the field empties out.
 
 ## Commands
 

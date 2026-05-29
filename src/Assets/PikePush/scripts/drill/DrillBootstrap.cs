@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PikePush.Combat;
 using PikePush.Drill.UI;
 using PikePush.Utls;
 using UnityEngine;
@@ -43,12 +44,15 @@ namespace PikePush.Drill
 
         readonly List<Block> friendly = new List<Block>();
         readonly List<Block> enemy = new List<Block>();
-        readonly HashSet<(Block, Block)> engaged = new HashSet<(Block, Block)>();
+        readonly List<Engagement> engagements = new List<Engagement>();
 
         BlockSelector selector;
         BlockCountPanel friendlyPanel;
         BlockCountPanel enemyPanel;
+        EngagementOverviewPanel engagementPanel;
         Font uiFont;
+
+        public IReadOnlyList<Engagement> Engagements => engagements;
 
         void Awake()
         {
@@ -74,6 +78,8 @@ namespace PikePush.Drill
                 () => enemy.Count, SpawnEnemy, RemoveLastEnemy,
                 0, MaxBlocksPerFaction);
 
+            engagementPanel = EngagementOverviewPanel.Build(canvas.transform, uiFont, engagements);
+
             int nF = Mathf.Clamp(initialFriendlyBlockCount, MinFriendlyBlocks, MaxBlocksPerFaction);
             for (int i = 0; i < nF; i++) SpawnFriendly();
 
@@ -87,6 +93,8 @@ namespace PikePush.Drill
         void Update()
         {
             DetectEngagements();
+            TickEngagements();
+            ResolveFinishedEngagements();
         }
 
         public int FriendlyCount => friendly.Count;
@@ -127,19 +135,27 @@ namespace PikePush.Drill
 
             var block = roster[last];
             roster.RemoveAt(last);
+            RemoveBlock(block);
+        }
 
-            // Cleanup: drop the block from any active engagement pair and from
-            // the selector so dangling state doesn't outlive it.
-            engaged.RemoveWhere(p => p.Item1 == block || p.Item2 == block);
+        void RemoveBlock(Block block)
+        {
+            // Drop any engagements this block is part of, then the selector,
+            // then the GameObject. Dangling state must not outlive the block.
+            for (int i = engagements.Count - 1; i >= 0; i--)
+            {
+                var eng = engagements[i];
+                if (eng.A == block || eng.B == block)
+                    engagements.RemoveAt(i);
+            }
             if (selector != null) selector.Remove(block);
             if (block != null) Destroy(block.gameObject);
-            LogHelper.debug($"[DrillBootstrap] Removed last block (remaining={roster.Count})");
         }
 
         void DetectEngagements()
         {
-            // O(N*M) over the two rosters. With both capped at 4 this is at
-            // most 16 checks per frame — well under polling budget.
+            // O(N*M) over the two rosters; both capped at 4 = at most 16 checks
+            // per frame. Skip pairs already engaged.
             for (int i = 0; i < friendly.Count; i++)
             {
                 var f = friendly[i];
@@ -148,35 +164,88 @@ namespace PikePush.Drill
                 {
                     var e = enemy[j];
                     if (e == null) continue;
+                    if (AlreadyEngaged(f, e)) continue;
 
-                    var pair = (f, e);
-                    bool inContact = FactionContact.InContact(f, e, MinContactRadius);
-                    if (inContact && engaged.Add(pair))
-                    {
-                        OnEngagementStarted(f, e);
-                    }
-                    else if (!inContact && engaged.Remove(pair))
-                    {
-                        OnEngagementEnded(f, e);
-                    }
+                    if (FactionContact.InContact(f, e, MinContactRadius))
+                        StartEngagement(f, e);
                 }
             }
         }
 
-        // V1 stub. The real wiring spins up a MeterGame instance per engaged
-        // pair; that work lives in docs/backlog.md under "Multi-block field
-        // battles (architecture)" since it needs MeterGame extracted from its
-        // current single-instance shape.
-        void OnEngagementStarted(Block f, Block e)
+        bool AlreadyEngaged(Block f, Block e)
+        {
+            for (int i = 0; i < engagements.Count; i++)
+            {
+                var eng = engagements[i];
+                if ((eng.A == f && eng.B == e) || (eng.A == e && eng.B == f))
+                    return true;
+            }
+            return false;
+        }
+
+        void StartEngagement(Block f, Block e)
         {
             LogHelper.debug($"[DrillBootstrap] ENGAGEMENT: {f.label} vs {e.label}");
             f.Issue(DrillCommand.Halt);
             e.Issue(DrillCommand.Halt);
+            engagements.Add(new Engagement(f, e));
         }
 
-        void OnEngagementEnded(Block f, Block e)
+        void TickEngagements()
         {
-            LogHelper.debug($"[DrillBootstrap] disengaged: {f.label} vs {e.label}");
+            float dt = Time.deltaTime;
+            for (int i = 0; i < engagements.Count; i++)
+            {
+                var eng = engagements[i];
+                bool pushingA = ShouldPush(eng.A);
+                bool pushingB = ShouldPush(eng.B);
+                eng.Tick(dt, pushingA, pushingB);
+            }
+        }
+
+        // Drill spar mode has no AI — both sides are player-driven via selection.
+        // Push happens when the block is in the current selection AND the player
+        // holds Space. Unselected blocks drain. Switching selection is part of
+        // the mechanic — you have to choose where your push goes.
+        bool ShouldPush(Block b)
+        {
+            if (b == null || selector == null) return false;
+            if (!SelectionContains(b)) return false;
+            return Input.GetKey(KeyCode.Space);
+        }
+
+        bool SelectionContains(Block b)
+        {
+            var sel = selector.Selected;
+            for (int i = 0; i < sel.Count; i++)
+                if (ReferenceEquals(sel[i], b)) return true;
+            return false;
+        }
+
+        void ResolveFinishedEngagements()
+        {
+            for (int i = engagements.Count - 1; i >= 0; i--)
+            {
+                var eng = engagements[i];
+                if (!eng.IsResolved) continue;
+                OnEngagementResolved(eng);
+                engagements.RemoveAt(i);
+            }
+        }
+
+        void OnEngagementResolved(Engagement eng)
+        {
+            LogHelper.debug($"[DrillBootstrap] WINNER: {eng.Winner?.label}  loser: {eng.Loser?.label}");
+
+            // The loser breaks — remove from the field. The winner stays put.
+            var loser = eng.Loser;
+            if (loser != null)
+            {
+                if (!friendly.Remove(loser)) enemy.Remove(loser);
+                RemoveBlock(loser);
+            }
+            friendlyPanel.Refresh();
+            enemyPanel.Refresh();
         }
 
         void EnsureLighting()

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using PikePush.Combat;
 using PikePush.Controls;
 using PikePush.Utls;
 
@@ -12,21 +13,19 @@ namespace PikePush.UI {
         [SerializeField]
         private ControlsManager controlsManager;
 
-        // UI element to represent the meter
-        [SerializeField] private Image meterFill; // Image used for the meter
-        [SerializeField] private Text meterPercentageText; // Text to show the percentage
-        [SerializeField] private Slider meterSlider; // Optional Slider as another representation
+        // UI elements
+        [SerializeField] private Image meterFill;
+        [SerializeField] private Text meterPercentageText;
+        [SerializeField] private Slider meterSlider;
 
-        // The rate at which the meter increases when the player presses the space key
-        [SerializeField] private float fillRate = 0.1f;
+        // Tuning — kept on the MonoBehaviour so existing scene / prefab values
+        // continue to override the runtime defaults set on MeterModel.
+        [SerializeField] private float fillRate = 0.6f;
+        [SerializeField] private float drainRate = 0.35f;
+        [SerializeField] private float startValue = 0.5f;
 
-        // The rate at which the meter decreases over time
-        [SerializeField] private float drainRate = 0.5f;
-
-        // The value of the meter (0 to 1)
-        private float meterValue = 0.5f;
-
-        private TaskCompletionSource<bool> tcs; // Used to await the user's choice
+        readonly MeterModel meter = new MeterModel();
+        TaskCompletionSource<bool> tcs;
 
         public async Task<bool> Show()
         {
@@ -47,119 +46,55 @@ namespace PikePush.UI {
 
         public void Update()
         {
-            if (!this.gameObject.activeInHierarchy)
-                return;
+            if (!this.gameObject.activeInHierarchy) return;
 
-            // get inputs
             ControlsManager.Controls activeControls = this.controlsManager.InputCheck();
+            bool pushing = activeControls.HasFlag(ControlsManager.Controls.Space);
+            meter.Tick(Time.deltaTime, pushing);
 
-            if (activeControls.HasFlag(ControlsManager.Controls.Space))
-            {
-                IncreaseMeter(fillRate);
-            }
-            else
-            {
-                DecreaseMeter(drainRate);
-            }
-
-            // Update the UI elements
             UpdateUI();
-            LogHelper.debug($"[MeterGame][Update]: {meterValue}");
+            LogHelper.debug($"[MeterGame][Update]: {meter.Value}");
 
-            // Check if the player has failed (meter reaches 0)
-            if (IsMeterEmpty())
+            switch (meter.Result)
             {
-                OnFail();
-            }
-            else if (IsMeterFull())
-            {
-                OnSuccess();
+                case MeterResult.Won: OnSuccess(); break;
+                case MeterResult.Lost: OnFail(); break;
             }
         }
 
-        // Updates the UI elements to reflect the current meter value
         private void UpdateUI()
         {
-            if (meterFill != null)
-            {
-                LogHelper.debug($"[MeterGame][UpdateUI][meterFill]: {meterValue}");
-                meterFill.fillAmount = meterValue; // For Image-based representation
-            }
-
-            if (meterPercentageText != null)
-            {
-                LogHelper.debug($"[MeterGame][UpdateUI][meterPercentageText]: {meterValue}");
-                meterPercentageText.text = $"{(int)(meterValue * 100)}%"; // Show percentage
-            }
-
-            if (meterSlider != null)
-            {
-                LogHelper.debug($"[MeterGame][UpdateUI][meterSlider]: {meterValue}");
-                meterSlider.value = meterValue; // For Slider-based representation
-            }
+            float value = meter.Value;
+            if (meterFill != null) meterFill.fillAmount = value;
+            if (meterPercentageText != null) meterPercentageText.text = $"{(int)(value * 100)}%";
+            if (meterSlider != null) meterSlider.value = value;
         }
 
-        // Called when the player fails
         private void OnSuccess()
         {
             LogHelper.debug("[MeterGame][OnSuccess]");
-            tcs.SetResult(true);
+            tcs?.TrySetResult(true);
             this.gameObject.SetActive(false);
         }
 
-        // Called when the player fails
         private void OnFail()
         {
             LogHelper.debug("[MeterGame][OnFail]");
-            tcs.SetResult(false);
+            tcs?.TrySetResult(false);
             this.gameObject.SetActive(false);
         }
 
-        // Public method to reset the meter
         public void ResetGame()
         {
-            meterValue = 0.5f;
+            meter.FillRate = fillRate;
+            meter.DrainRate = drainRate;
+            meter.StartValue = startValue;
+            meter.Reset();
             UpdateUI();
         }
 
-        // Public method to increase the meter value
-        public void IncreaseMeter(float amount)
-        {
-            if (!IsMeterFull())
-            {
-                meterValue += amount;
-            }
-        }
-
-        // Public method to decrease the meter value
-        public void DecreaseMeter(float amount)
-        {
-            if (!IsMeterEmpty())
-            {
-                LogHelper.debug($"[MeterGame][DecreaseMeter] '{amount}'");
-                meterValue -= amount % Time.deltaTime;
-            }
-
-        }
-
-        // // Public method to set the meter value directly
-        // public void SetMeterValue(float value)
-        // {
-        //     meterValue = (value);
-        //     UpdateUI();
-        // }
-
-        // Public method to check if the meter is full
-        public bool IsMeterFull()
-        {
-            return meterValue >= 1;
-        }
-
-        // Public method to check if the meter is empty
-        public bool IsMeterEmpty()
-        {
-            return meterValue <= 0;
-        }
+        public bool IsMeterFull() => meter.Result == MeterResult.Won;
+        public bool IsMeterEmpty() => meter.Result == MeterResult.Lost;
     }
 
 }

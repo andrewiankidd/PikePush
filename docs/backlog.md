@@ -45,14 +45,14 @@ These are answered and not up for re-litigation while V1 is in flight.
 
 ## Drill mode
 
-### Wire a real MeterGame to spar-mode engagements
-Drill spar mode now spawns opposing factions and detects contact between
-friendly and enemy blocks, but the engagement is a stub — both blocks
-just halt and the contact gets logged. The real "Push of Pike" wiring
-needs the existing `MeterGame` extracted from its single-instance shape
-so multiple meters can run in parallel (one per engaged pair). That's
-the same work as **Campaign V1 → Multi-block field battles
-(architecture)** — landing it there delivers spar mode for free.
+### World-anchored engagement HUD
+Active engagements currently surface in a top-left stacked overview
+panel. Polish: render each engagement as a floating bar at the
+contact-midpoint world position, with the friendly side's meter on the
+left and the enemy's on the right. Selected blocks should get a larger,
+brighter meter; non-selected ones a small chip. Per the spec —
+"floating mini-meter per engaged block + big meter for the selected one"
+— from the campaign combat memory.
 
 ### Drill command — remaining visual / movement work
 
@@ -140,16 +140,27 @@ Worcester (1651). Linear progression for V1; branching deferred to V2.
 Affects save format and Quartermaster gating.
 
 ### Multi-block field battles (architecture)
-- Each engaged block owns its own `MeterGame` instance.
-- NPC blocks self-fight via weighted-random AI.
-- Player input routes to the **selected** block — same selection paradigm as Drill
-  (multi-select honoured; mash routes to all selected engaged blocks).
-- HUD: floating mini-meter per engaged block + big meter for the selected one.
+The core architecture landed in drill spar mode (`Engagement` +
+`MeterModel`, one engagement instance per pair, parallel meters). Still
+to do for Campaign:
+- Drive enemy meters with the **enemy tactical AI** (scripted commands
+  per scenario) rather than no-input. The mash-decision-per-frame for
+  NPC blocks reads from a per-scenario AI profile.
+- Wire `MeterModel.FillRateMultiplier` to the **formation counter-matrix**
+  below (currently `Engagement` exposes the multiplier but
+  `DrillBootstrap.StartEngagement` doesn't set it).
+- HUD: the current top-left stacked overview is functional but
+  unpolished — see Drill mode → "World-anchored engagement HUD" for the
+  Campaign-grade rendering.
+- Multi-engagement selection routing: shift-click already routes Space
+  to every selected engaged block; verify under Campaign load.
 
 ### Formation counter-matrix
 Defender formation × attacker type modifies the engaged block's
-MeterGame parameters. Table in
+`MeterModel.FillRateMultiplier`. Table in
 `c:/Users/Andrew/.claude/projects/c--git-PikePush/memory/project_campaign_combat.md`.
+Wire the lookup into `DrillBootstrap.StartEngagement` (and the future
+Campaign equivalent) so it reads the formation state at engagement-time.
 
 ### Enemy tactical AI (scripted-per-scenario)
 For V1, enemy block behaviour is **scripted by the scenario**, not
