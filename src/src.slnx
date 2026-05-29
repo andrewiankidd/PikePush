@@ -1,4 +1,6 @@
 ﻿<Solution>
+  <Project Path="PikePush.Runtime.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="PikePush.Tests.EditMode.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>

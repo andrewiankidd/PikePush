@@ -28,13 +28,8 @@ namespace PikePush.Drill
         void Update()
         {
             if (viewCamera == null) return;
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                Clear();
-                return;
-            }
-
+            // Esc-to-clear is owned by DrillCommandPanel so a submenu-Back
+            // doesn't also clobber the selection on the same frame.
             if (!Input.GetMouseButtonDown(0)) return;
             if (PointerOverUI()) return;
 

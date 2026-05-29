@@ -11,41 +11,23 @@ namespace PikePush.Drill.UI
         RectTransform buttonContainer;
         Font buttonFont;
 
-        public readonly struct Entry
-        {
-            public readonly DrillCommand Command;
-            public readonly string Label;
-            public readonly KeyCode Key;
-
-            public Entry(DrillCommand cmd, string label, KeyCode key)
-            {
-                Command = cmd;
-                Label = label;
-                Key = key;
-            }
-        }
-
-        // Working set surfaced on the flat bar. The full categorised palette
-        // (postures, doublings, wheeling, etc.) is the next UI iteration —
-        // [docs/backlog.md] "Categorised command palette".
-        public static readonly Entry[] CommandSet =
-        {
-            new Entry(DrillCommand.Halt,                 "Halt",              KeyCode.H),
-            new Entry(DrillCommand.ForwardMarch,         "Forward March",     KeyCode.M),
-            new Entry(DrillCommand.LeftHandFace,         "Left Face",         KeyCode.A),
-            new Entry(DrillCommand.RightHandFace,        "Right Face",        KeyCode.D),
-            new Entry(DrillCommand.LeftHandAboutFace,    "About Face L",      KeyCode.Q),
-            new Entry(DrillCommand.RightHandAboutFace,   "About Face R",      KeyCode.E),
-            new Entry(DrillCommand.OpenOrder,            "Open Order",        KeyCode.O),
-            new Entry(DrillCommand.CloseOrder,           "Close Order",       KeyCode.C),
-            new Entry(DrillCommand.ClosestOrder,         "Closest Order",     KeyCode.V),
-            new Entry(DrillCommand.ChargeForHorse,       "Charge for Horse",  KeyCode.B),
-            new Entry(DrillCommand.AdvanceYourPike,      "Advance Pike",      KeyCode.Alpha1),
-            new Entry(DrillCommand.Reform,               "Reform",            KeyCode.R),
-        };
-
-        readonly List<DrillCommandButton> buttons = new List<DrillCommandButton>();
+        readonly List<DrillCommandButton> commandButtons = new List<DrillCommandButton>();
+        readonly List<GameObject> groupButtons = new List<GameObject>();
+        GameObject backButton;
         IReadOnlyList<Block> currentBlocks = System.Array.Empty<Block>();
+
+        DrillCommandGroup? activeGroup;
+        bool needsRebuild;
+
+        // Keyboard shortcuts only on the three top-level commands. The full
+        // categorised set is desktop-mouse / mobile-tap territory — period
+        // drill commands aren't one-letter mappable.
+        static readonly (DrillCommand cmd, KeyCode key)[] TopLevelHotkeys =
+        {
+            (DrillCommand.Halt,         KeyCode.H),
+            (DrillCommand.ForwardMarch, KeyCode.M),
+            (DrillCommand.Reform,       KeyCode.R),
+        };
 
         public void Initialize(BlockSelector selector, RectTransform buttonContainer, Font buttonFont)
         {
@@ -67,16 +49,39 @@ namespace PikePush.Drill.UI
         {
             if (currentBlocks.Count == 0) return;
 
-            foreach (var entry in CommandSet)
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (Input.GetKeyDown(entry.Key))
+                HandleEscape();
+                return;
+            }
+
+            // Hotkeys fire only at top-level; in a submenu the player has
+            // committed to that group and the buttons are the navigation surface.
+            if (activeGroup == null)
+            {
+                foreach (var (cmd, key) in TopLevelHotkeys)
                 {
-                    LogHelper.debug($"[DrillCommandPanel] Key {entry.Key} → {entry.Command}");
-                    IssueToAll(entry.Command);
+                    if (Input.GetKeyDown(key))
+                    {
+                        LogHelper.debug($"[DrillCommandPanel] Key {key} → {cmd}");
+                        IssueToAll(cmd);
+                    }
                 }
             }
 
+            if (needsRebuild) RebuildButtons();
             RefreshGating();
+        }
+
+        void HandleEscape()
+        {
+            if (activeGroup != null)
+            {
+                CollapseToTopLevel();
+                return;
+            }
+            // At top-level, Esc clears selection (which hides the panel).
+            selector.Clear();
         }
 
         void OnSelectionChanged(IReadOnlyList<Block> blocks)
@@ -85,13 +90,17 @@ namespace PikePush.Drill.UI
             currentBlocks = blocks;
             SetVisible(blocks.Count > 0);
 
+            // A new selection always lands you at top-level.
+            activeGroup = null;
+            needsRebuild = true;
+
             if (blocks.Count == 0)
             {
                 ClearButtons();
                 return;
             }
 
-            if (buttons.Count == 0) BuildButtons();
+            RebuildButtons();
             RefreshGating();
         }
 
@@ -102,54 +111,134 @@ namespace PikePush.Drill.UI
 
         void ClearButtons()
         {
-            foreach (var b in buttons)
+            foreach (var b in commandButtons)
                 if (b != null) Destroy(b.gameObject);
-            buttons.Clear();
+            commandButtons.Clear();
+
+            foreach (var g in groupButtons)
+                if (g != null) Destroy(g);
+            groupButtons.Clear();
+
+            if (backButton != null) { Destroy(backButton); backButton = null; }
         }
 
-        void BuildButtons()
+        void RebuildButtons()
         {
+            ClearButtons();
             if (buttonContainer == null) return;
 
-            for (int i = 0; i < CommandSet.Length; i++)
-            {
-                var entry = CommandSet[i];
-                var btn = DrillCommandButton.Build(buttonContainer, entry.Command, entry.Label, entry.Key,
-                    buttonFont, OnButtonPressed);
-                buttons.Add(btn);
-            }
+            if (activeGroup == null) BuildTopLevel();
+            else BuildSubmenu(activeGroup.Value);
+
+            needsRebuild = false;
+        }
+
+        void BuildTopLevel()
+        {
+            foreach (var cmd in DrillCommandCatalog.TopLevelCommands)
+                AddCommandButton(cmd);
+
+            foreach (var group in DrillCommandCatalog.TopLevelGroups)
+                AddGroupOpener(group);
+        }
+
+        void BuildSubmenu(DrillCommandGroup group)
+        {
+            backButton = BuildPlainButton(buttonContainer, buttonFont, "◀ Back", CollapseToTopLevel);
+
+            foreach (var cmd in DrillCommandCatalog.CommandsInGroup(group))
+                AddCommandButton(cmd);
+        }
+
+        void AddCommandButton(DrillCommand cmd)
+        {
+            string label = DrillCommandCatalog.Label(cmd);
+            var btn = DrillCommandButton.Build(buttonContainer, cmd, label, KeyCode.None,
+                buttonFont, OnCommandButtonPressed);
+            commandButtons.Add(btn);
+        }
+
+        void AddGroupOpener(DrillCommandGroup group)
+        {
+            string label = DrillCommandCatalog.GroupLabel(group) + " ▸";
+            var go = BuildPlainButton(buttonContainer, buttonFont, label, () => OpenGroup(group));
+            groupButtons.Add(go);
+        }
+
+        void OpenGroup(DrillCommandGroup group)
+        {
+            LogHelper.debug($"[DrillCommandPanel] Opening submenu: {group}");
+            activeGroup = group;
+            needsRebuild = true;
+        }
+
+        void CollapseToTopLevel()
+        {
+            LogHelper.debug("[DrillCommandPanel] Collapse to top-level");
+            activeGroup = null;
+            needsRebuild = true;
         }
 
         void RefreshGating()
         {
-            for (int i = 0; i < buttons.Count; i++)
+            foreach (var btn in commandButtons)
             {
-                var entry = CommandSet[i];
-                bool allowed = AllBlocksAllow(entry.Command);
-                buttons[i].SetInteractable(allowed);
+                if (btn == null) continue;
+                bool allowed = AllBlocksAllow(btn.Command);
+                btn.SetInteractable(allowed);
             }
         }
 
         bool AllBlocksAllow(DrillCommand cmd)
         {
             for (int i = 0; i < currentBlocks.Count; i++)
-            {
                 if (!currentBlocks[i].AllowsCommand(cmd)) return false;
-            }
             return currentBlocks.Count > 0;
         }
 
         void IssueToAll(DrillCommand cmd)
         {
             for (int i = 0; i < currentBlocks.Count; i++)
-            {
                 currentBlocks[i].Issue(cmd);
-            }
         }
 
-        void OnButtonPressed(DrillCommand cmd)
+        void OnCommandButtonPressed(DrillCommand cmd)
         {
             IssueToAll(cmd);
+            // Spec: selecting a sub-option fires the command and auto-collapses.
+            if (activeGroup != null) CollapseToTopLevel();
+        }
+
+        // Plain navigation button (Back, group openers). Uses Unity's Button so
+        // disabled visuals come for free if we later gate openers (e.g.
+        // "Postures" while braced is technically always available, so probably not).
+        static GameObject BuildPlainButton(Transform parent, Font font, string label, System.Action onClick)
+        {
+            var go = new GameObject($"NavButton_{label}");
+            go.transform.SetParent(parent, false);
+
+            var img = go.AddComponent<UnityEngine.UI.Image>();
+            img.color = new Color(0.22f, 0.20f, 0.16f, 0.95f);
+
+            var btn = go.AddComponent<UnityEngine.UI.Button>();
+            btn.onClick.AddListener(() => onClick?.Invoke());
+
+            var textGo = new GameObject("Label");
+            textGo.transform.SetParent(go.transform, false);
+            var trect = textGo.AddComponent<RectTransform>();
+            trect.anchorMin = Vector2.zero;
+            trect.anchorMax = Vector2.one;
+            trect.offsetMin = Vector2.zero;
+            trect.offsetMax = Vector2.zero;
+            var txt = textGo.AddComponent<UnityEngine.UI.Text>();
+            txt.font = font;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.color = Color.white;
+            txt.fontSize = 18;
+            txt.text = label;
+            txt.raycastTarget = false;
+
+            return go;
         }
     }
 }

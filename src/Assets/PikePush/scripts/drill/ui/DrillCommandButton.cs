@@ -20,6 +20,7 @@ namespace PikePush.Drill.UI
         bool interactable = true;
 
         public bool Interactable => interactable;
+        public DrillCommand Command => command;
 
         public static DrillCommandButton Build(Transform parent, DrillCommand cmd, string label, KeyCode hintKey,
             Font font, Action<DrillCommand> onPressed)
