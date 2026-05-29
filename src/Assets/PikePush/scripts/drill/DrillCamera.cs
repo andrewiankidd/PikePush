@@ -5,13 +5,17 @@ namespace PikePush.Drill
     public class DrillCamera : MonoBehaviour
     {
         [SerializeField] Vector3 lookTarget = Vector3.zero;
-        [SerializeField] float distance = 18f;
-        [SerializeField] float pitchDegrees = 55f;
+        // Defaults framed so both faction z-lines (FriendlyZ = -10,
+        // EnemyZ = +10 in DrillBootstrap) are visible without panning.
+        // Old defaults (pitch 55, distance 18) put the camera at z ≈ -10,
+        // sitting right on top of the friendly line.
+        [SerializeField] float distance = 32f;
+        [SerializeField] float pitchDegrees = 38f;
         [SerializeField] float yawDegrees = 0f;
         [SerializeField] float panSpeed = 0.06f;
         [SerializeField] float zoomSpeed = 6f;
-        [SerializeField] float minDistance = 6f;
-        [SerializeField] float maxDistance = 40f;
+        [SerializeField] float minDistance = 8f;
+        [SerializeField] float maxDistance = 60f;
 
         void LateUpdate()
         {
