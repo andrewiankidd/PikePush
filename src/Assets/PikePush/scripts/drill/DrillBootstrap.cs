@@ -113,7 +113,6 @@ namespace PikePush.Drill
             int index = roster.Count;
             string label = $"{faction} {index + 1}";
             var go = new GameObject(label.Replace(' ', '_'));
-            go.transform.position = new Vector3((index - (MaxBlocksPerFaction - 1) * 0.5f) * BlockSpacingX, 0f, z);
             go.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
 
             var block = go.AddComponent<Block>();
@@ -125,6 +124,7 @@ namespace PikePush.Drill
             block.faction = faction;
 
             roster.Add(block);
+            RecenterRoster(roster, z);
             LogHelper.debug($"[DrillBootstrap] Spawned {label} (faction total={roster.Count})");
         }
 
@@ -134,8 +134,27 @@ namespace PikePush.Drill
             if (last < 0) return;
 
             var block = roster[last];
+            float z = block != null ? block.transform.position.z : 0f;
             roster.RemoveAt(last);
             RemoveBlock(block);
+            RecenterRoster(roster, z);
+        }
+
+        // Distribute the roster symmetrically around x=0 along the faction's
+        // z-line so the camera (which looks at the origin) stays framed on
+        // the actual blocks. Engaged blocks stay put — they're committed to
+        // their fight and shouldn't teleport.
+        static void RecenterRoster(List<Block> roster, float z)
+        {
+            int n = roster.Count;
+            for (int i = 0; i < n; i++)
+            {
+                var b = roster[i];
+                if (b == null) continue;
+                if (b.IsEngaged) continue;
+                float x = (i - (n - 1) * 0.5f) * BlockSpacingX;
+                b.transform.position = new Vector3(x, 0f, z);
+            }
         }
 
         void RemoveBlock(Block block)
