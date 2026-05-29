@@ -1,9 +1,3 @@
-#if UNITY_EDITOR
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEditor;
-#endif
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;

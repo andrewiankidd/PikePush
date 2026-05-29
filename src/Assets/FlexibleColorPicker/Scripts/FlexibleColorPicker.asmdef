@@ -1,10 +1,7 @@
 {
-    "name": "PikePush.Runtime",
-    "rootNamespace": "PikePush",
-    "references": [
-        "Unity.TextMeshPro",
-        "FlexibleColorPicker"
-    ],
+    "name": "FlexibleColorPicker",
+    "rootNamespace": "",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
