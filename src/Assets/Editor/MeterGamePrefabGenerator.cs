@@ -8,15 +8,31 @@ namespace PikePush.EditorTools
     // Resources prefab so drill / campaign can instantiate the exact same
     // visual setup instead of rebuilding UI by hand.
     //
-    // Run once via PikePush/Regenerate MeterGame Prefab from Runner. Re-run
-    // any time the runner's MeterGame visual changes — drill picks up the
-    // new prefab on next play.
+    // Auto-runs on editor load if the prefab is missing so you don't have
+    // to remember the menu. Re-run manually via
+    // PikePush/Regenerate MeterGame Prefab from Runner any time the runner's
+    // MeterGame visual changes — drill picks up the new prefab on next play.
+    [InitializeOnLoad]
     public static class MeterGamePrefabGenerator
     {
         const string GameScenePath = "Assets/PikePush/Scenes/Game.unity";
         const string OutputDir     = "Assets/PikePush/Resources";
         const string OutputPath    = "Assets/PikePush/Resources/MeterGame.prefab";
         const string MeterGameName = "MeterGame";
+
+        static MeterGamePrefabGenerator()
+        {
+            // Defer to next editor tick — the AssetDatabase isn't always
+            // ready during the static constructor on a fresh import.
+            EditorApplication.delayCall += AutoGenerateIfMissing;
+        }
+
+        static void AutoGenerateIfMissing()
+        {
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(OutputPath) != null) return;
+            Debug.Log($"[MeterGamePrefabGenerator] {OutputPath} missing — auto-generating from {GameScenePath}");
+            Regenerate();
+        }
 
         [MenuItem("PikePush/Regenerate MeterGame Prefab from Runner")]
         public static void Regenerate()
