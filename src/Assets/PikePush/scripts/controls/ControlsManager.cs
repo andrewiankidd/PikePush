@@ -35,17 +35,22 @@ namespace PikePush.Controls {
         {
             LogHelper.debug($"[ControlsManager][Awake] Starting up...");
 
-            // find gameobject for each available controlscheme
+            // Snapshot every ControlScheme in the scene once (including
+            // inactive — the GameObjects are deliberately disabled until
+            // selected), then look up by name. Single Find call instead of
+            // one per scheme.
+            var allSchemes = UnityEngine.Object.FindObjectsByType<ControlScheme>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var schemeByName = allSchemes.ToDictionary(s => s.name);
+
             foreach (string controlScheme in controlSchemes)
             {
-                var controlSchemeGameObject = Object.FindObjectsByType<ControlScheme>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(o => o.name == controlScheme);
-                if (controlSchemeGameObject)
+                if (schemeByName.TryGetValue(controlScheme, out var instance))
                 {
                     LogHelper.debug($"[ControlsManager][Awake] Adding schema: {controlScheme}");
-                    controlSchemeGameObject.gameObject.SetActive(false);
-                    controlSchemeInstances[controlScheme] = controlSchemeGameObject;
+                    instance.gameObject.SetActive(false);
+                    controlSchemeInstances[controlScheme] = instance;
                 }
-                
             }
 
             // read prefs
