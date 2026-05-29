@@ -7,10 +7,19 @@ namespace PikePush.Drill.UI
 {
     public class DrillCommandButton : MonoBehaviour, IPointerClickHandler
     {
+        static readonly Color EnabledColor  = new Color(0.18f, 0.18f, 0.22f, 0.95f);
+        static readonly Color DisabledColor = new Color(0.15f, 0.15f, 0.18f, 0.55f);
+        static readonly Color EnabledText   = Color.white;
+        static readonly Color DisabledText  = new Color(0.55f, 0.55f, 0.55f);
+
+        Image background;
         Text labelText;
         Text hintText;
         DrillCommand command;
         Action<DrillCommand> onPressed;
+        bool interactable = true;
+
+        public bool Interactable => interactable;
 
         public static DrillCommandButton Build(Transform parent, DrillCommand cmd, string label, KeyCode hintKey,
             Font font, Action<DrillCommand> onPressed)
@@ -19,7 +28,7 @@ namespace PikePush.Drill.UI
             go.transform.SetParent(parent, false);
 
             var img = go.AddComponent<Image>();
-            img.color = new Color(0.18f, 0.18f, 0.22f, 0.95f);
+            img.color = EnabledColor;
             img.raycastTarget = true;
 
             var labelGo = new GameObject("Label");
@@ -32,7 +41,7 @@ namespace PikePush.Drill.UI
             var labelTxt = labelGo.AddComponent<Text>();
             labelTxt.font = font;
             labelTxt.alignment = TextAnchor.MiddleCenter;
-            labelTxt.color = Color.white;
+            labelTxt.color = EnabledText;
             labelTxt.fontSize = 18;
             labelTxt.text = label;
             labelTxt.raycastTarget = false;
@@ -49,10 +58,11 @@ namespace PikePush.Drill.UI
             hintTxt.alignment = TextAnchor.MiddleCenter;
             hintTxt.color = new Color(0.7f, 0.7f, 0.7f);
             hintTxt.fontSize = 14;
-            hintTxt.text = ShouldShowKeyHint() ? $"[{hintKey}]" : string.Empty;
+            hintTxt.text = ShouldShowKeyHint() && hintKey != KeyCode.None ? $"[{hintKey}]" : string.Empty;
             hintTxt.raycastTarget = false;
 
             var btn = go.AddComponent<DrillCommandButton>();
+            btn.background = img;
             btn.labelText = labelTxt;
             btn.hintText = hintTxt;
             btn.command = cmd;
@@ -60,8 +70,18 @@ namespace PikePush.Drill.UI
             return btn;
         }
 
+        public void SetInteractable(bool value)
+        {
+            if (interactable == value) return;
+            interactable = value;
+            background.color = value ? EnabledColor : DisabledColor;
+            labelText.color = value ? EnabledText : DisabledText;
+            background.raycastTarget = value;
+        }
+
         public void OnPointerClick(PointerEventData eventData)
         {
+            if (!interactable) return;
             onPressed?.Invoke(command);
         }
 

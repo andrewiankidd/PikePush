@@ -15,6 +15,7 @@ namespace PikePush.Drill
         [Header("Motion")]
         [SerializeField] public float marchSpeed = 1.3f;
         [SerializeField] public float turnDegreesPerSecond = 180f;
+        [SerializeField] public float wheelDegreesPerSecond = 30f;
         [SerializeField] public float spacingLerpRate = 3f;
         [SerializeField] public float braceCrouchYScale = 0.85f;
 
@@ -24,16 +25,26 @@ namespace PikePush.Drill
         [SerializeField] public Color soldierColor = new Color(0.65f, 0.55f, 0.40f);
 
         public bool IsMarching { get; private set; }
-        public bool IsBracing { get; private set; }
+        public PikePosture Posture { get; private set; } = PikePosture.Order;
+        public SpacingOrder Spacing { get; private set; } = SpacingOrder.Order;
+        public bool IsWheeling { get; private set; }
+        public bool IsBracing => Posture == PikePosture.ChargeForHorse;
+
         public float GoalYawDegrees { get; private set; }
         public float CurrentYawDegrees { get; private set; }
         public float CurrentSpacingMultiplier { get; private set; } = 1f;
 
-        const float SpacingOpen = 1.6f;
-        const float SpacingClosed = 0.85f;
-        const float SpacingClosest = 0.6f;
+        public BlockState State => new BlockState
+        {
+            Posture = Posture,
+            Spacing = Spacing,
+            IsWheeling = IsWheeling,
+            IsMarching = IsMarching,
+        };
+
         float targetSpacingMultiplier = 1f;
         float targetYScale = 1f;
+        int wheelDirection;
 
         readonly List<Soldier> members = new List<Soldier>();
         BoxCollider selectionCollider;
@@ -55,6 +66,9 @@ namespace PikePush.Drill
 
         void Update()
         {
+            if (IsWheeling)
+                GoalYawDegrees += wheelDirection * wheelDegreesPerSecond * Time.deltaTime;
+
             StepYaw();
 
             if (IsMarching)
@@ -71,7 +85,7 @@ namespace PikePush.Drill
         void StepYaw()
         {
             float diff = GoalYawDegrees - CurrentYawDegrees;
-            float step = turnDegreesPerSecond * Time.deltaTime;
+            float step = (IsWheeling ? wheelDegreesPerSecond : turnDegreesPerSecond) * Time.deltaTime;
             if (Mathf.Abs(diff) <= step)
                 CurrentYawDegrees = GoalYawDegrees;
             else
@@ -80,61 +94,151 @@ namespace PikePush.Drill
             transform.rotation = Quaternion.Euler(0f, CurrentYawDegrees, 0f);
         }
 
+        public bool AllowsCommand(DrillCommand cmd) => BlockRules.AllowsCommand(cmd, State);
+
         public void Issue(DrillCommand cmd)
         {
+            if (!AllowsCommand(cmd))
+            {
+                LogHelper.debug($"[Block:{label}][Issue] {cmd} — disallowed by current state, ignoring");
+                return;
+            }
             LogHelper.debug($"[Block:{label}][Issue] {cmd}");
 
-            // Most movement commands cancel bracing.
-            if (cmd != DrillCommand.PrepareForHorse && cmd != DrillCommand.Halt)
-                ExitBracing();
+            if (BlockRules.IsPosture(cmd)) { ApplyPosture(cmd); return; }
+            if (BlockRules.IsSpacing(cmd)) { ApplySpacing(cmd); return; }
+            if (BlockRules.IsFacing(cmd)) { ApplyFacing(cmd); return; }
 
             switch (cmd)
             {
                 case DrillCommand.Halt:
                     IsMarching = false;
+                    IsWheeling = false;
                     break;
                 case DrillCommand.ForwardMarch:
                     IsMarching = true;
                     break;
-                case DrillCommand.RightFace:
-                    GoalYawDegrees += 90f;
+                case DrillCommand.MarchOn:
+                    IsWheeling = false;
+                    IsMarching = true;
                     break;
-                case DrillCommand.LeftFace:
-                    GoalYawDegrees -= 90f;
+                case DrillCommand.RightHandWheel:
+                    IsWheeling = true;
+                    IsMarching = true;
+                    wheelDirection = 1;
                     break;
-                case DrillCommand.AboutFaceRight:
+                case DrillCommand.LeftHandWheel:
+                    IsWheeling = true;
+                    IsMarching = true;
+                    wheelDirection = -1;
+                    break;
+                case DrillCommand.WheelMidstRight:
+                    IsWheeling = true;
+                    IsMarching = true;
+                    wheelDirection = 1;
+                    // TODO: midst-pivot positioning offset
+                    break;
+                case DrillCommand.WheelMidstLeft:
+                    IsWheeling = true;
+                    IsMarching = true;
+                    wheelDirection = -1;
+                    // TODO: midst-pivot positioning offset
+                    break;
+                case DrillCommand.Reform:
+                    // Reset to a clean state: at-Order spacing, Advance posture, halted.
+                    IsMarching = false;
+                    IsWheeling = false;
+                    ApplySpacing(DrillCommand.OrderSpacing);
+                    ApplyPosture(DrillCommand.AdvanceYourPike);
+                    break;
+                case DrillCommand.PrepareToCountermarchMaintainingGround:
+                case DrillCommand.PrepareToCountermarchLosingGround:
+                case DrillCommand.PrepareToCountermarchGainingGround:
+                    // TODO: stage flag for the next Countermarch
+                    break;
+                case DrillCommand.Countermarch:
                     GoalYawDegrees += 180f;
                     break;
-                case DrillCommand.AboutFaceLeft:
-                    GoalYawDegrees -= 180f;
-                    break;
-                case DrillCommand.OpenOrder:
-                    targetSpacingMultiplier = SpacingOpen;
-                    break;
-                case DrillCommand.CloseOrder:
-                    targetSpacingMultiplier = SpacingClosed;
-                    break;
-                case DrillCommand.ClosestOrder:
-                    targetSpacingMultiplier = SpacingClosest;
-                    break;
-                case DrillCommand.PrepareForHorse:
-                    EnterBracing();
+                default:
+                    // V1 state-only stubs: doublings, filing, inversion.
+                    // Recorded in [docs/backlog.md] — visuals follow with the animation suite.
                     break;
             }
         }
 
-        void EnterBracing()
+        void ApplyPosture(DrillCommand cmd)
         {
-            IsBracing = true;
-            IsMarching = false;
-            targetYScale = braceCrouchYScale;
+            switch (cmd)
+            {
+                case DrillCommand.OrderYourPike:     Posture = PikePosture.Order;          break;
+                case DrillCommand.AdvanceYourPike:   Posture = PikePosture.Advance;        break;
+                case DrillCommand.ShoulderYourPike:  Posture = PikePosture.Shoulder;       break;
+                case DrillCommand.ChargeYourPike:    Posture = PikePosture.Charge;         break;
+                case DrillCommand.ChargeToTheRear:   Posture = PikePosture.ChargeRear;     break;
+                case DrillCommand.Port:              Posture = PikePosture.Port;           break;
+                case DrillCommand.LowPortYourPike:   Posture = PikePosture.LowPort;        break;
+                case DrillCommand.ShortenYourPike:   Posture = PikePosture.Shorten;        break;
+                case DrillCommand.ChargeForHorse:    Posture = PikePosture.ChargeForHorse; break;
+                case DrillCommand.FormCircle:        Posture = PikePosture.FormCircle;     break;
+                case DrillCommand.TrailYourPike:     Posture = PikePosture.Trail;          break;
+            }
+
+            // ChargeForHorse holds you in a braced crouch; everything else stands tall.
+            targetYScale = Posture == PikePosture.ChargeForHorse ? braceCrouchYScale : 1f;
+            if (Posture == PikePosture.ChargeForHorse) IsMarching = false;
         }
 
-        void ExitBracing()
+        void ApplySpacing(DrillCommand cmd)
         {
-            if (!IsBracing) return;
-            IsBracing = false;
-            targetYScale = 1f;
+            switch (cmd)
+            {
+                case DrillCommand.ClosestOrder:           Spacing = SpacingOrder.Closest;             break;
+                case DrillCommand.CloseOrder:             Spacing = SpacingOrder.Close;               break;
+                case DrillCommand.OrderSpacing:           Spacing = SpacingOrder.Order;               break;
+                case DrillCommand.OpenOrder:              Spacing = SpacingOrder.Open;                break;
+                case DrillCommand.DoubleDistance:         Spacing = SpacingOrder.DoubleDistance;      break;
+                case DrillCommand.TwiceDoubleDistance:    Spacing = SpacingOrder.TwiceDoubleDistance; break;
+                // Directional file/rank variants land at the same end-state spacing for V1.
+                case DrillCommand.FilesOpenOrder:
+                case DrillCommand.FilesOpenOrderFromLeft:
+                case DrillCommand.FilesOpenOrderFromMidst:
+                case DrillCommand.RanksOpenOrder:
+                case DrillCommand.RanksOpenOrderFromRear:
+                case DrillCommand.RanksAndFilesOpenOrder:
+                    Spacing = SpacingOrder.Open;
+                    break;
+            }
+            targetSpacingMultiplier = SpacingMultiplier(Spacing);
+        }
+
+        void ApplyFacing(DrillCommand cmd)
+        {
+            switch (cmd)
+            {
+                case DrillCommand.RightHandFace:        GoalYawDegrees += 90f;  break;
+                case DrillCommand.LeftHandFace:         GoalYawDegrees -= 90f;  break;
+                case DrillCommand.LeftHandAboutFace:    GoalYawDegrees -= 180f; break;
+                case DrillCommand.RightHandAboutFace:   GoalYawDegrees += 180f; break;
+                case DrillCommand.FaceToTheFront:       /* no-op, intent is "all face same way" */ break;
+                case DrillCommand.RightHandIncline:     /* on-march drift — TODO */ break;
+                case DrillCommand.LeftHandIncline:      /* on-march drift — TODO */ break;
+                case DrillCommand.FaceToFrontAndRear:   /* split-face — TODO */ break;
+                case DrillCommand.FaceToBothFlanks:     /* split-face — TODO */ break;
+            }
+        }
+
+        static float SpacingMultiplier(SpacingOrder s)
+        {
+            switch (s)
+            {
+                case SpacingOrder.Closest:             return 0.60f;
+                case SpacingOrder.Close:               return 0.85f;
+                case SpacingOrder.Order:               return 1.00f;
+                case SpacingOrder.Open:                return 1.60f;
+                case SpacingOrder.DoubleDistance:      return 2.40f;
+                case SpacingOrder.TwiceDoubleDistance: return 4.00f;
+            }
+            return 1.0f;
         }
 
         public Vector3 LocalSlot(int rankIndex, int fileIndex)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using PikePush.Utls;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,9 +9,11 @@ namespace PikePush.Drill
     public class BlockSelector : MonoBehaviour
     {
         Camera viewCamera;
+        readonly List<Block> selected = new List<Block>();
 
-        public Block Selected { get; private set; }
-        public event Action<Block> SelectionChanged;
+        public IReadOnlyList<Block> Selected => selected;
+        public Block Primary => selected.Count > 0 ? selected[0] : null;
+        public event Action<IReadOnlyList<Block>> SelectionChanged;
 
         public void Initialize(Camera viewCamera)
         {
@@ -25,27 +28,74 @@ namespace PikePush.Drill
         void Update()
         {
             if (viewCamera == null) return;
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Clear();
+                return;
+            }
+
             if (!Input.GetMouseButtonDown(0)) return;
             if (PointerOverUI()) return;
+
+            bool additive = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
             Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
             {
                 var block = hit.collider.GetComponentInParent<Block>();
-                Select(block);
+                if (block != null)
+                {
+                    if (additive) Toggle(block);
+                    else SelectExclusive(block);
+                    return;
+                }
+            }
+
+            // Clicked empty ground — clear unless additive (shift-click on nothing is a no-op).
+            if (!additive) Clear();
+        }
+
+        public void Notify()
+        {
+            SelectionChanged?.Invoke(selected);
+        }
+
+        public void Clear()
+        {
+            if (selected.Count == 0) return;
+            selected.Clear();
+            LogHelper.debug("[BlockSelector] Cleared selection");
+            Notify();
+        }
+
+        public void Remove(Block block)
+        {
+            if (block == null) return;
+            if (selected.Remove(block)) Notify();
+        }
+
+        void SelectExclusive(Block block)
+        {
+            if (selected.Count == 1 && ReferenceEquals(selected[0], block)) return;
+            selected.Clear();
+            selected.Add(block);
+            LogHelper.debug($"[BlockSelector] Selected: {block.label}");
+            Notify();
+        }
+
+        void Toggle(Block block)
+        {
+            if (selected.Remove(block))
+            {
+                LogHelper.debug($"[BlockSelector] Deselected: {block.label}");
             }
             else
             {
-                Select(null);
+                selected.Add(block);
+                LogHelper.debug($"[BlockSelector] Added: {block.label}");
             }
-        }
-
-        void Select(Block block)
-        {
-            if (ReferenceEquals(block, Selected)) return;
-            LogHelper.debug($"[BlockSelector] Selected: {(block != null ? block.label : "<none>")}");
-            Selected = block;
-            SelectionChanged?.Invoke(block);
+            Notify();
         }
 
         static bool PointerOverUI()

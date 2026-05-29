@@ -9,12 +9,16 @@ namespace PikePush.Drill
 {
     public class DrillBootstrap : MonoBehaviour
     {
+        public const int MinBlocks = 1;
+        public const int MaxBlocks = 4;
+        const float BlockSpacingX = 8f;
+
         [Header("Field")]
         [SerializeField] Color fieldColor = new Color(0.30f, 0.55f, 0.20f);
         [SerializeField] float fieldSize = 80f;
 
         [Header("Blocks")]
-        [SerializeField] int blockCount = 1;
+        [SerializeField] int initialBlockCount = 1;
         [SerializeField] int ranks = 4;
         [SerializeField] int files = 4;
         [SerializeField] GameObject soldierPrefab;
@@ -22,9 +26,13 @@ namespace PikePush.Drill
             new Color(0.75f, 0.30f, 0.30f),
             new Color(0.30f, 0.45f, 0.85f),
             new Color(0.85f, 0.75f, 0.30f),
+            new Color(0.40f, 0.75f, 0.45f),
         };
 
         readonly List<Block> spawnedBlocks = new List<Block>();
+        BlockSelector selector;
+        BlockCountPanel countPanel;
+        Font uiFont;
 
         void Awake()
         {
@@ -33,11 +41,57 @@ namespace PikePush.Drill
             var cam = EnsureCamera();
             var canvas = EnsureCanvas();
             EnsureEventSystem();
+            uiFont = DefaultUIFont();
 
-            var selector = EnsureSelector(cam);
-            var panel = EnsureCommandPanel(canvas, selector);
+            selector = EnsureSelector(cam);
+            EnsureCommandPanel(canvas, selector);
+            countPanel = EnsureBlockCountPanel(canvas);
 
-            SpawnBlocks();
+            int n = Mathf.Clamp(initialBlockCount, MinBlocks, MaxBlocks);
+            for (int i = 0; i < n; i++) SpawnBlock();
+            countPanel.Refresh();
+        }
+
+        public int BlockCount => spawnedBlocks.Count;
+
+        public void SpawnBlock()
+        {
+            if (spawnedBlocks.Count >= MaxBlocks) return;
+
+            int index = spawnedBlocks.Count;
+            var go = new GameObject($"Block_{index + 1}");
+            go.transform.position = SpawnPositionForIndex(index);
+
+            var block = go.AddComponent<Block>();
+            block.ranks = ranks;
+            block.files = files;
+            block.label = $"Block {index + 1}";
+            block.soldierPrefab = soldierPrefab;
+            block.soldierColor = blockColors[index % blockColors.Length];
+            spawnedBlocks.Add(block);
+            LogHelper.debug($"[DrillBootstrap] Spawned {block.label} (total={spawnedBlocks.Count})");
+        }
+
+        public void RemoveLastBlock()
+        {
+            if (spawnedBlocks.Count <= MinBlocks) return;
+
+            int last = spawnedBlocks.Count - 1;
+            var block = spawnedBlocks[last];
+            spawnedBlocks.RemoveAt(last);
+
+            if (selector != null) selector.Remove(block);
+            if (block != null) Destroy(block.gameObject);
+            LogHelper.debug($"[DrillBootstrap] Removed last block (remaining={spawnedBlocks.Count})");
+        }
+
+        Vector3 SpawnPositionForIndex(int index)
+        {
+            // Fan out symmetrically around origin so the camera frames the army cleanly
+            // as it grows. We re-derive every block's intended slot on each spawn rather
+            // than re-positioning existing blocks (which would be jarring at runtime).
+            float x = (index - (MaxBlocks - 1) * 0.5f) * BlockSpacingX;
+            return new Vector3(x, 0f, 0f);
         }
 
         void EnsureLighting()
@@ -118,12 +172,12 @@ namespace PikePush.Drill
             if (existing != null) return existing;
 
             var go = new GameObject("BlockSelector");
-            var selector = go.AddComponent<BlockSelector>();
-            selector.Initialize(cam);
-            return selector;
+            var s = go.AddComponent<BlockSelector>();
+            s.Initialize(cam);
+            return s;
         }
 
-        DrillCommandPanel EnsureCommandPanel(Canvas canvas, BlockSelector selector)
+        DrillCommandPanel EnsureCommandPanel(Canvas canvas, BlockSelector sel)
         {
             var existing = FindAnyObjectByType<DrillCommandPanel>();
             if (existing != null) return existing;
@@ -157,26 +211,19 @@ namespace PikePush.Drill
             layout.childForceExpandHeight = true;
 
             var panel = panelGo.AddComponent<DrillCommandPanel>();
-            panel.Initialize(selector, layoutRect, DefaultUIFont());
+            panel.Initialize(sel, layoutRect, uiFont);
 
             return panel;
         }
 
-        void SpawnBlocks()
+        BlockCountPanel EnsureBlockCountPanel(Canvas canvas)
         {
-            for (int i = 0; i < blockCount; i++)
-            {
-                var go = new GameObject($"Block_{i + 1}");
-                go.transform.position = new Vector3((i - (blockCount - 1) * 0.5f) * 8f, 0f, 0f);
-                var block = go.AddComponent<Block>();
-                block.ranks = ranks;
-                block.files = files;
-                block.label = $"Block {i + 1}";
-                block.soldierPrefab = soldierPrefab;
-                block.soldierColor = blockColors[i % blockColors.Length];
-                spawnedBlocks.Add(block);
-            }
-            LogHelper.debug($"[DrillBootstrap] Spawned {spawnedBlocks.Count} block(s)");
+            var existing = FindAnyObjectByType<BlockCountPanel>();
+            if (existing != null) return existing;
+
+            return BlockCountPanel.Build(canvas.transform, uiFont,
+                () => spawnedBlocks.Count, SpawnBlock, RemoveLastBlock,
+                MinBlocks, MaxBlocks);
         }
 
         static Font DefaultUIFont()
