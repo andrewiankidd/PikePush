@@ -252,8 +252,14 @@ namespace PikePush.Drill
             {
                 var eng = engagements[i];
                 if (!eng.IsResolved) continue;
-                OnEngagementResolved(eng);
+
+                // Remove first, then resolve. OnEngagementResolved calls
+                // RemoveBlock, which scans `engagements` for entries that
+                // contain the loser and removes them — so this entry has
+                // to be out of the list first to avoid a double-remove
+                // / index-shift bug.
                 engagements.RemoveAt(i);
+                OnEngagementResolved(eng);
             }
         }
 
