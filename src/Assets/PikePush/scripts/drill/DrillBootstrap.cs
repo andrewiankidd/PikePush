@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using PikePush.Combat;
 using PikePush.Drill.UI;
+using PikePush.UI;
 using PikePush.Utls;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -16,6 +17,14 @@ namespace PikePush.Drill
         const float FriendlyZ = -10f;
         const float EnemyZ = 10f;
         const float MinContactRadius = 5f;
+
+        // HUD stacking constants.
+        const float HudPerSideHeight = 110f;   // each MeterGame slider strip
+        const float HudPairSpacing   = 12f;    // gap between friendly/enemy bars within a pair
+        const float HudEngagementGap = 24f;    // gap between engagement pairs
+        const float HudBaseY         = 140f;   // bottom edge of stack, sits above the command panel
+        static readonly Color FriendlyHudColor = new Color(0.30f, 0.65f, 0.95f);
+        static readonly Color EnemyHudColor    = new Color(0.95f, 0.35f, 0.35f);
 
         [Header("Field")]
         [SerializeField] Color fieldColor = new Color(0.30f, 0.55f, 0.20f);
@@ -45,40 +54,45 @@ namespace PikePush.Drill
         readonly List<Block> friendly = new List<Block>();
         readonly List<Block> enemy = new List<Block>();
         readonly List<Engagement> engagements = new List<Engagement>();
+        readonly Dictionary<Engagement, EngagementHud> huds = new Dictionary<Engagement, EngagementHud>();
 
         BlockSelector selector;
         BlockCountPanel friendlyPanel;
         BlockCountPanel enemyPanel;
-        EngagementOverviewPanel engagementPanel;
+        Canvas hudCanvas;
         Font uiFont;
 
         public IReadOnlyList<Engagement> Engagements => engagements;
+
+        struct EngagementHud
+        {
+            public MeterGame Friendly;
+            public MeterGame Enemy;
+        }
 
         void Awake()
         {
             EnsureLighting();
             EnsureField();
             var cam = EnsureCamera();
-            var canvas = EnsureCanvas();
+            hudCanvas = EnsureCanvas();
             EnsureEventSystem();
             uiFont = DefaultUIFont();
 
             selector = EnsureSelector(cam);
-            EnsureCommandPanel(canvas, selector);
+            EnsureCommandPanel(hudCanvas, selector);
 
-            friendlyPanel = BlockCountPanel.Build(canvas.transform, uiFont,
+            friendlyPanel = BlockCountPanel.Build(hudCanvas.transform, uiFont,
                 "Friendly", new Color(0.6f, 0.8f, 1f),
                 new Vector2(-20f, -20f),
                 () => friendly.Count, SpawnFriendly, RemoveLastFriendly,
                 MinFriendlyBlocks, MaxBlocksPerFaction);
 
-            enemyPanel = BlockCountPanel.Build(canvas.transform, uiFont,
+            enemyPanel = BlockCountPanel.Build(hudCanvas.transform, uiFont,
                 "Enemy", new Color(1f, 0.6f, 0.6f),
                 new Vector2(-20f, -86f),
                 () => enemy.Count, SpawnEnemy, RemoveLastEnemy,
                 0, MaxBlocksPerFaction);
-
-            engagementPanel = EngagementOverviewPanel.Build(canvas.transform, uiFont, engagements);
 
             int nF = Mathf.Clamp(initialFriendlyBlockCount, MinFriendlyBlocks, MaxBlocksPerFaction);
             for (int i = 0; i < nF; i++) SpawnFriendly();
@@ -160,8 +174,8 @@ namespace PikePush.Drill
         void RemoveBlock(Block block)
         {
             // Drop any engagements this block is part of, unlocking the other
-            // side. Then the selector, then the GameObject. Dangling state
-            // must not outlive the block.
+            // side and tearing down the HUD. Then the selector, then the
+            // GameObject. Dangling state must not outlive the block.
             for (int i = engagements.Count - 1; i >= 0; i--)
             {
                 var eng = engagements[i];
@@ -169,10 +183,12 @@ namespace PikePush.Drill
 
                 var other = eng.A == block ? eng.B : eng.A;
                 if (other != null) other.IsEngaged = false;
+                DestroyHud(eng);
                 engagements.RemoveAt(i);
             }
             if (selector != null) selector.Remove(block);
             if (block != null) Destroy(block.gameObject);
+            RepositionHuds();
         }
 
         void DetectEngagements()
@@ -215,7 +231,62 @@ namespace PikePush.Drill
             e.Issue(DrillCommand.Halt);
             f.IsEngaged = true;
             e.IsEngaged = true;
-            engagements.Add(new Engagement(f, e));
+
+            var eng = new Engagement(f, e);
+            engagements.Add(eng);
+            SpawnHud(eng);
+            RepositionHuds();
+        }
+
+        // Each engagement gets two MeterGame instances (one per side), reusing
+        // the same mash-bar UI the runner shows. Friendly bar on top, enemy
+        // beneath. Multiple engagements stack vertically.
+        void SpawnHud(Engagement eng)
+        {
+            if (hudCanvas == null) return;
+            var f = MeterGame.BuildDynamic(hudCanvas.transform, uiFont, eng.A.label, eng.MeterA, FriendlyHudColor);
+            var e = MeterGame.BuildDynamic(hudCanvas.transform, uiFont, eng.B.label, eng.MeterB, EnemyHudColor);
+            // The dynamic build sets a default sizeDelta meant for full-size
+            // runner display. Shrink to fit a stacked HUD strip.
+            ResizeForStack(f);
+            ResizeForStack(e);
+            huds[eng] = new EngagementHud { Friendly = f, Enemy = e };
+        }
+
+        static void ResizeForStack(MeterGame mg)
+        {
+            if (mg == null) return;
+            var rt = (RectTransform)mg.transform;
+            rt.sizeDelta = new Vector2(720f, HudPerSideHeight);
+        }
+
+        void DestroyHud(Engagement eng)
+        {
+            if (!huds.TryGetValue(eng, out var hud)) return;
+            if (hud.Friendly != null) Destroy(hud.Friendly.gameObject);
+            if (hud.Enemy != null) Destroy(hud.Enemy.gameObject);
+            huds.Remove(eng);
+        }
+
+        void RepositionHuds()
+        {
+            float y = HudBaseY;
+            for (int i = 0; i < engagements.Count; i++)
+            {
+                if (!huds.TryGetValue(engagements[i], out var hud)) continue;
+                SetAnchoredY(hud.Enemy,    y);                                  // enemy on bottom
+                SetAnchoredY(hud.Friendly, y + HudPerSideHeight + HudPairSpacing);
+                y += (HudPerSideHeight * 2f) + HudPairSpacing + HudEngagementGap;
+            }
+        }
+
+        static void SetAnchoredY(MeterGame mg, float y)
+        {
+            if (mg == null) return;
+            var rt = (RectTransform)mg.transform;
+            var pos = rt.anchoredPosition;
+            pos.y = y;
+            rt.anchoredPosition = pos;
         }
 
         void TickEngagements()
@@ -288,6 +359,10 @@ namespace PikePush.Drill
         {
             LogHelper.debug($"[DrillBootstrap] WINNER: {eng.Winner?.label}  loser: {eng.Loser?.label}");
 
+            // Tear down the HUD for this engagement first so it doesn't keep
+            // showing a frozen meter.
+            DestroyHud(eng);
+
             // Winner unlocks first — order matters because RemoveBlock can
             // strip the loser from the rosters and selector.
             if (eng.Winner != null) eng.Winner.IsEngaged = false;
@@ -300,6 +375,7 @@ namespace PikePush.Drill
             }
             friendlyPanel.Refresh();
             enemyPanel.Refresh();
+            RepositionHuds();
         }
 
         void EnsureLighting()
