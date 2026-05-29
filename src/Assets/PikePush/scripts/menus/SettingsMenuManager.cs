@@ -30,12 +30,10 @@ namespace PikePush.Menus {
 
             int defaultControlScheme = 0;
 
-            // todo lol
             if (
                 Application.platform is RuntimePlatform.Android
                 or RuntimePlatform.IPhonePlayer
                 or RuntimePlatform.WebGLPlayer
-                or RuntimePlatform
             ) {
                 defaultControlScheme = 1;
             }

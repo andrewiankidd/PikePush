@@ -64,10 +64,11 @@ namespace PikePush.Tests.Drill
         {
             // These are the always-visible bar entries — losing them breaks
             // the "no submenu needed for the basics" promise.
-            var top = new HashSet<DrillCommand>(DrillCommandCatalog.TopLevelCommands);
-            Assert.Contains(DrillCommand.Halt, top);
-            Assert.Contains(DrillCommand.ForwardMarch, top);
-            Assert.Contains(DrillCommand.Reform, top);
+            // CollectionAssert handles IEnumerable; NUnit's Assert.Contains
+            // wants non-generic ICollection which HashSet<T> doesn't implement.
+            CollectionAssert.Contains(DrillCommandCatalog.TopLevelCommands, DrillCommand.Halt);
+            CollectionAssert.Contains(DrillCommandCatalog.TopLevelCommands, DrillCommand.ForwardMarch);
+            CollectionAssert.Contains(DrillCommandCatalog.TopLevelCommands, DrillCommand.Reform);
         }
     }
 }

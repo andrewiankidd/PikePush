@@ -38,7 +38,7 @@ namespace PikePush.Controls {
             // find gameobject for each available controlscheme
             foreach (string controlScheme in controlSchemes)
             {
-                var controlSchemeGameObject = GameObject.FindObjectsOfType<ControlScheme>(true).First(o => o.name == controlScheme);
+                var controlSchemeGameObject = Object.FindObjectsByType<ControlScheme>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(o => o.name == controlScheme);
                 if (controlSchemeGameObject)
                 {
                     LogHelper.debug($"[ControlsManager][Awake] Adding schema: {controlScheme}");
