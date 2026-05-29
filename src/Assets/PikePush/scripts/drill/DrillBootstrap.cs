@@ -197,10 +197,26 @@ namespace PikePush.Drill
             for (int i = 0; i < engagements.Count; i++)
             {
                 var eng = engagements[i];
+
+                // Live-recompute the counter-matrix multiplier each frame so
+                // a mid-engagement spacing change (e.g. forming Closest Order
+                // to push back harder) takes effect immediately.
+                eng.MeterA.FillRateMultiplier = MultiplierFor(eng.A);
+                eng.MeterB.FillRateMultiplier = MultiplierFor(eng.B);
+
                 bool pushingA = ShouldPush(eng.A);
                 bool pushingB = ShouldPush(eng.B);
                 eng.Tick(dt, pushingA, pushingB);
             }
+        }
+
+        // Both sides of a drill-mode engagement are pike blocks; the attacker
+        // type is always PikePush. Campaign will compute the attacker type
+        // per opposing block (cavalry mixed in).
+        static float MultiplierFor(Block b)
+        {
+            if (b == null) return 1f;
+            return CounterMatrix.FillRateMultiplier(b.Posture, b.Spacing, AttackType.PikePush);
         }
 
         // Drill spar mode has no AI — both sides are player-driven via selection.

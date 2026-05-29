@@ -141,26 +141,21 @@ Affects save format and Quartermaster gating.
 
 ### Multi-block field battles (architecture)
 The core architecture landed in drill spar mode (`Engagement` +
-`MeterModel`, one engagement instance per pair, parallel meters). Still
-to do for Campaign:
+`MeterModel`, one engagement instance per pair, parallel meters; counter
+matrix recomputed every frame from block state). Still to do for
+Campaign:
 - Drive enemy meters with the **enemy tactical AI** (scripted commands
   per scenario) rather than no-input. The mash-decision-per-frame for
   NPC blocks reads from a per-scenario AI profile.
-- Wire `MeterModel.FillRateMultiplier` to the **formation counter-matrix**
-  below (currently `Engagement` exposes the multiplier but
-  `DrillBootstrap.StartEngagement` doesn't set it).
+- Attacker-type detection: drill mode hard-codes `AttackType.PikePush`
+  because both sides are pike blocks. Campaign needs to derive the
+  attacker type per opposing block — cavalry blocks attack as
+  `CavalryCharge`, musketeer fire is yet another category to add.
 - HUD: the current top-left stacked overview is functional but
   unpolished — see Drill mode → "World-anchored engagement HUD" for the
   Campaign-grade rendering.
 - Multi-engagement selection routing: shift-click already routes Space
   to every selected engaged block; verify under Campaign load.
-
-### Formation counter-matrix
-Defender formation × attacker type modifies the engaged block's
-`MeterModel.FillRateMultiplier`. Table in
-`c:/Users/Andrew/.claude/projects/c--git-PikePush/memory/project_campaign_combat.md`.
-Wire the lookup into `DrillBootstrap.StartEngagement` (and the future
-Campaign equivalent) so it reads the formation state at engagement-time.
 
 ### Enemy tactical AI (scripted-per-scenario)
 For V1, enemy block behaviour is **scripted by the scenario**, not

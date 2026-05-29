@@ -82,6 +82,23 @@ breaks and is removed from the field. First meter to drain to zero
 (Lost) declares the *other* block the winner. The block-count panels
 refresh as the field empties out.
 
+### Formation matters
+
+Spacing modifies each side's fill rate during a push:
+
+| Spacing | vs Pike Push |
+|---------|--------------|
+| Open Order | −10% (low density) |
+| Order | baseline |
+| Close Order | +15% (push power) |
+| Closest Order | +25% (max push) |
+
+So forming **Closest Order** mid-engagement is the canonical move — your
+meter fills faster than the enemy's. The multiplier recomputes every
+frame, so you can swap spacings on the fly. The full matrix (including
+cavalry, where Bracing for Horse swings the other way) is in
+[`CounterMatrix`](https://github.com/andrewiankidd/PikePush/blob/master/src/Assets/PikePush/scripts/combat/CounterMatrix.cs).
+
 ## Commands
 
 The full period-authentic drill manual is in
