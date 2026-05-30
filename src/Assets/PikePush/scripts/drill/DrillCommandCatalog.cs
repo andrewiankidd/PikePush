@@ -93,6 +93,60 @@ namespace PikePush.Drill
             return cmd.ToString();
         }
 
+        // "Implemented" here means pressing the button produces a *visible*
+        // effect — block movement, rotation, spacing transition, the brace
+        // crouch, etc. Commands that flip internal state but have no visual
+        // yet (most postures pending the animation suite, all doublings,
+        // file-on / inversion choreography, prepare-countermarch staging,
+        // non-canonical face variants) return false. The UI calls this on
+        // every press and fires a TODO toast when it's false.
+        public static bool IsImplemented(DrillCommand cmd)
+        {
+            switch (cmd)
+            {
+                // Movement
+                case DrillCommand.Halt:
+                case DrillCommand.ForwardMarch:
+                case DrillCommand.MarchOn:
+
+                // Postures with a visible effect (brace crouch)
+                case DrillCommand.ChargeForHorse:
+
+                // Distancing — the six numeric levels are wired to the spacing
+                // multiplier. Directional variants (FilesOpenOrderFromLeft etc.)
+                // collapse onto Open and have no choreography, so they're TODO.
+                case DrillCommand.ClosestOrder:
+                case DrillCommand.CloseOrder:
+                case DrillCommand.OrderSpacing:
+                case DrillCommand.OpenOrder:
+                case DrillCommand.DoubleDistance:
+                case DrillCommand.TwiceDoubleDistance:
+
+                // Facings — the four cardinal turns rotate the block.
+                case DrillCommand.RightHandFace:
+                case DrillCommand.LeftHandFace:
+                case DrillCommand.LeftHandAboutFace:
+                case DrillCommand.RightHandAboutFace:
+
+                // Wheeling — continuous rotation while marching.
+                case DrillCommand.RightHandWheel:
+                case DrillCommand.LeftHandWheel:
+                case DrillCommand.WheelMidstRight:
+                case DrillCommand.WheelMidstLeft:
+
+                // Countermarch — maps to a 180° about-face for V1. The
+                // 'Prepare to ...' staging commands are stubs (see default).
+                case DrillCommand.Countermarch:
+
+                // Reform — resets to Order spacing + Advance pike + halt.
+                case DrillCommand.Reform:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         public static string GroupLabel(DrillCommandGroup g)
         {
             switch (g)

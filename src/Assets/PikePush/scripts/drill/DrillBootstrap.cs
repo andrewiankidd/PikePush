@@ -58,6 +58,7 @@ namespace PikePush.Drill
         BlockSelector selector;
         BlockCountPanel friendlyPanel;
         BlockCountPanel enemyPanel;
+        DrillToast toast;
         Canvas hudCanvas;
         Font uiFont;
         GameObject meterGamePrefab;
@@ -82,6 +83,7 @@ namespace PikePush.Drill
             uiFont = DefaultUIFont();
 
             selector = EnsureSelector(cam);
+            toast = DrillToast.Build(hudCanvas.transform, uiFont);
             EnsureCommandPanel(hudCanvas, selector);
 
             meterGamePrefab = Resources.Load<GameObject>(MeterGamePrefabResourcePath);
@@ -576,7 +578,7 @@ namespace PikePush.Drill
             layout.childForceExpandHeight = true;
 
             var panel = panelGo.AddComponent<DrillCommandPanel>();
-            panel.Initialize(sel, layoutRect, uiFont);
+            panel.Initialize(sel, layoutRect, uiFont, toast);
 
             return panel;
         }

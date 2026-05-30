@@ -70,5 +70,60 @@ namespace PikePush.Tests.Drill
             CollectionAssert.Contains(DrillCommandCatalog.TopLevelCommands, DrillCommand.ForwardMarch);
             CollectionAssert.Contains(DrillCommandCatalog.TopLevelCommands, DrillCommand.Reform);
         }
+
+        // --- IsImplemented coverage --------------------------------------
+
+        [Test]
+        public void EveryTopLevelCommand_IsImplemented()
+        {
+            // Players first see top-level commands. If any of them are TODO
+            // stubs, drill mode feels broken on first open. Lock them in.
+            foreach (var cmd in DrillCommandCatalog.TopLevelCommands)
+            {
+                Assert.IsTrue(DrillCommandCatalog.IsImplemented(cmd),
+                    $"Top-level command {cmd} reports IsImplemented = false. " +
+                    "Either implement its visual or stop surfacing it on the bar.");
+            }
+        }
+
+        [Test]
+        public void Doublings_AreStubs()
+        {
+            // Doublings need rank/file rearrangement choreography. All TODO
+            // pending the animation suite — this test catches anyone
+            // accidentally marking one implemented before the visual lands.
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.HalfFilesLeftDouble));
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.RanksRightDouble));
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.BringersUpDoubleFrontageLeft));
+        }
+
+        [Test]
+        public void FilingAndInversion_AreStubs()
+        {
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.FilesFileOn));
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.RanksFromLeftFileOn));
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.RecoverTheBody));
+        }
+
+        [Test]
+        public void PrepareToCountermarch_AreStubs_ButCountermarchIsLive()
+        {
+            // Countermarch maps to a 180° about-face today; the prep stages
+            // are flag-stubs.
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.PrepareToCountermarchMaintainingGround));
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.PrepareToCountermarchLosingGround));
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.PrepareToCountermarchGainingGround));
+            Assert.IsTrue(DrillCommandCatalog.IsImplemented(DrillCommand.Countermarch));
+        }
+
+        [Test]
+        public void NonCanonicalFacings_AreStubs()
+        {
+            // The four cardinal faces work; the inclines and split-faces don't.
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.RightHandIncline));
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.LeftHandIncline));
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.FaceToFrontAndRear));
+            Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.FaceToBothFlanks));
+        }
     }
 }

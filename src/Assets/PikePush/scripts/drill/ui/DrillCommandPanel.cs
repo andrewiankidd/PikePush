@@ -10,6 +10,7 @@ namespace PikePush.Drill.UI
         BlockSelector selector;
         RectTransform buttonContainer;
         Font buttonFont;
+        DrillToast toast;
 
         readonly List<DrillCommandButton> commandButtons = new List<DrillCommandButton>();
         readonly List<GameObject> groupButtons = new List<GameObject>();
@@ -29,11 +30,12 @@ namespace PikePush.Drill.UI
             (DrillCommand.Reform,       KeyCode.R),
         };
 
-        public void Initialize(BlockSelector selector, RectTransform buttonContainer, Font buttonFont)
+        public void Initialize(BlockSelector selector, RectTransform buttonContainer, Font buttonFont, DrillToast toast = null)
         {
             this.selector = selector;
             this.buttonContainer = buttonContainer;
             this.buttonFont = buttonFont;
+            this.toast = toast;
 
             selector.SelectionChanged += OnSelectionChanged;
             OnSelectionChanged(selector.Selected);
@@ -198,8 +200,18 @@ namespace PikePush.Drill.UI
 
         void IssueToAll(DrillCommand cmd)
         {
+            WarnIfStub(cmd);
             for (int i = 0; i < currentBlocks.Count; i++)
                 currentBlocks[i].Issue(cmd);
+        }
+
+        // If the command is wired logically but has no visible effect yet,
+        // toast the player so a no-op press doesn't look like a broken UI.
+        void WarnIfStub(DrillCommand cmd)
+        {
+            if (toast == null) return;
+            if (DrillCommandCatalog.IsImplemented(cmd)) return;
+            toast.Show($"TODO — '{DrillCommandCatalog.Label(cmd)}' has no visual yet (state still updates)");
         }
 
         void OnCommandButtonPressed(DrillCommand cmd)
