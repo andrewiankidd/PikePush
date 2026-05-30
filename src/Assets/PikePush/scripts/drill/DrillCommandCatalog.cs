@@ -93,6 +93,21 @@ namespace PikePush.Drill
             return cmd.ToString();
         }
 
+        // Keyboard shortcut for a command. Drill mode only listens for these
+        // while no submenu is open (top-level state). KeyCode.None means no
+        // shortcut. Period drill commands aren't single-letter mappable
+        // beyond the three top-level ones — the bigger set stays mouse/tap.
+        public static UnityEngine.KeyCode HotKey(DrillCommand cmd)
+        {
+            switch (cmd)
+            {
+                case DrillCommand.Halt:         return UnityEngine.KeyCode.H;
+                case DrillCommand.ForwardMarch: return UnityEngine.KeyCode.M;
+                case DrillCommand.Reform:       return UnityEngine.KeyCode.R;
+                default:                         return UnityEngine.KeyCode.None;
+            }
+        }
+
         // "Implemented" here means pressing the button produces a *visible*
         // effect — block movement, rotation, spacing transition, the brace
         // crouch, etc. Commands that flip internal state but have no visual

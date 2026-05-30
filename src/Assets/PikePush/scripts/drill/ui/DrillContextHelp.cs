@@ -125,10 +125,8 @@ namespace PikePush.Drill.UI
                 body.text =
                     "Pick a command from the bar.\n\n" +
                     "Hotkeys:\n" +
-                    "  H — Halt\n" +
-                    "  M — Forward March\n" +
-                    "  R — Reform\n\n" +
-                    "Shift+Click to add blocks.\n" +
+                    BuildHotkeyList() +
+                    "\nShift+Click to add blocks.\n" +
                     "Esc or click empty ground to\n" +
                     "clear the selection.";
             }
@@ -144,6 +142,20 @@ namespace PikePush.Drill.UI
                     "Middle mouse to pan camera.\n" +
                     "Scroll wheel to zoom.";
             }
+        }
+
+        // Pulls every top-level command's hotkey from the catalog so the help
+        // panel stays in sync with whatever's actually wired on the buttons.
+        static string BuildHotkeyList()
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var cmd in DrillCommandCatalog.TopLevelCommands)
+            {
+                var key = DrillCommandCatalog.HotKey(cmd);
+                if (key == KeyCode.None) continue;
+                sb.Append("  ").Append(key).Append(" — ").Append(DrillCommandCatalog.Label(cmd)).Append('\n');
+            }
+            return sb.ToString();
         }
 
         bool AnySelectedIsEngaged()

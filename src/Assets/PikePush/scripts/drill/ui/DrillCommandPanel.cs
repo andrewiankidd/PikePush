@@ -20,15 +20,9 @@ namespace PikePush.Drill.UI
         DrillCommandGroup? activeGroup;
         bool needsRebuild;
 
-        // Keyboard shortcuts only on the three top-level commands. The full
-        // categorised set is desktop-mouse / mobile-tap territory — period
-        // drill commands aren't one-letter mappable.
-        static readonly (DrillCommand cmd, KeyCode key)[] TopLevelHotkeys =
-        {
-            (DrillCommand.Halt,         KeyCode.H),
-            (DrillCommand.ForwardMarch, KeyCode.M),
-            (DrillCommand.Reform,       KeyCode.R),
-        };
+        // Keyboard shortcuts only fire at top-level (no open submenu). The
+        // mapping lives in DrillCommandCatalog.HotKey so the same source
+        // feeds both this listener and the per-button hint label.
 
         public void Initialize(BlockSelector selector, RectTransform buttonContainer, Font buttonFont, DrillToast toast = null)
         {
@@ -61,9 +55,10 @@ namespace PikePush.Drill.UI
             // committed to that group and the buttons are the navigation surface.
             if (activeGroup == null)
             {
-                foreach (var (cmd, key) in TopLevelHotkeys)
+                foreach (var cmd in DrillCommandCatalog.TopLevelCommands)
                 {
-                    if (Input.GetKeyDown(key))
+                    var key = DrillCommandCatalog.HotKey(cmd);
+                    if (key != KeyCode.None && Input.GetKeyDown(key))
                     {
                         LogHelper.debug($"[DrillCommandPanel] Key {key} → {cmd}");
                         IssueToAll(cmd);
@@ -155,7 +150,8 @@ namespace PikePush.Drill.UI
         void AddCommandButton(DrillCommand cmd)
         {
             string label = DrillCommandCatalog.Label(cmd);
-            var btn = DrillCommandButton.Build(buttonContainer, cmd, label, KeyCode.None,
+            KeyCode hint = DrillCommandCatalog.HotKey(cmd);
+            var btn = DrillCommandButton.Build(buttonContainer, cmd, label, hint,
                 buttonFont, OnCommandButtonPressed);
             commandButtons.Add(btn);
         }

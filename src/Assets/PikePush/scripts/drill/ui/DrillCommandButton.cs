@@ -11,6 +11,8 @@ namespace PikePush.Drill.UI
         static readonly Color DisabledColor = new Color(0.15f, 0.15f, 0.18f, 0.55f);
         static readonly Color EnabledText   = Color.white;
         static readonly Color DisabledText  = new Color(0.55f, 0.55f, 0.55f);
+        static readonly Color EnabledHint   = new Color(0.75f, 0.75f, 0.75f);
+        static readonly Color DisabledHint  = new Color(0.45f, 0.45f, 0.45f);
 
         Image background;
         Text labelText;
@@ -57,9 +59,9 @@ namespace PikePush.Drill.UI
             var hintTxt = hintGo.AddComponent<Text>();
             hintTxt.font = font;
             hintTxt.alignment = TextAnchor.MiddleCenter;
-            hintTxt.color = new Color(0.7f, 0.7f, 0.7f);
+            hintTxt.color = EnabledHint;
             hintTxt.fontSize = 14;
-            hintTxt.text = ShouldShowKeyHint() && hintKey != KeyCode.None ? $"[{hintKey}]" : string.Empty;
+            hintTxt.text = ShouldShowKeyHint() && hintKey != KeyCode.None ? $"({hintKey})" : string.Empty;
             hintTxt.raycastTarget = false;
 
             var btn = go.AddComponent<DrillCommandButton>();
@@ -77,6 +79,7 @@ namespace PikePush.Drill.UI
             interactable = value;
             background.color = value ? EnabledColor : DisabledColor;
             labelText.color = value ? EnabledText : DisabledText;
+            if (hintText != null) hintText.color = value ? EnabledHint : DisabledHint;
             background.raycastTarget = value;
         }
 
