@@ -27,19 +27,24 @@ namespace PikePush.Drill.UI
 
             var rt = go.AddComponent<RectTransform>();
             // Bottom-right corner, sitting just above the command toolbar
-            // (toolbar is anchored at y=20 with height 110 => top of toolbar at y=130).
+            // (toolbar is anchored at y=20 with height 110 => top of toolbar
+            // at y=130). Pivot is at the bottom-right so when the
+            // ContentSizeFitter grows the panel to fit its body text, the
+            // extra height pushes the TOP edge upward rather than the
+            // bottom edge down into the toolbar.
             rt.anchorMin = new Vector2(1f, 0f);
             rt.anchorMax = new Vector2(1f, 0f);
             rt.pivot     = new Vector2(1f, 0f);
             rt.anchoredPosition = new Vector2(-20f, 150f);
-            rt.sizeDelta = new Vector2(320f, 340f);
+            rt.sizeDelta = new Vector2(320f, 0f); // height is driven by ContentSizeFitter below
 
             var bg = go.AddComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.55f);
             bg.raycastTarget = false;
 
             // Title at the top, body fills the rest. VerticalLayoutGroup keeps
-            // it tidy if either text grows.
+            // it tidy and reports a preferred height that ContentSizeFitter
+            // then applies to the parent rect.
             var layout = go.AddComponent<VerticalLayoutGroup>();
             layout.padding = new RectOffset(14, 14, 12, 12);
             layout.spacing = 8f;
@@ -48,6 +53,13 @@ namespace PikePush.Drill.UI
             layout.childControlHeight = true;
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
+
+            // The point of this whole panel: grow upward to fit whatever the
+            // current state's body text needs, instead of overflowing a fixed
+            // box. Width stays unconstrained so the right-edge anchor is firm.
+            var fitter = go.AddComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            fitter.verticalFit   = ContentSizeFitter.FitMode.PreferredSize;
 
             var titleGo = new GameObject("Title");
             titleGo.transform.SetParent(go.transform, false);
