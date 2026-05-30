@@ -68,6 +68,8 @@ namespace PikePush.Drill
         {
             public MeterGame Friendly;
             public MeterGame Enemy;
+            public Text FriendlyAdvantage;
+            public Text EnemyAdvantage;
         }
 
         void Awake()
@@ -258,7 +260,13 @@ namespace PikePush.Drill
             if (hudCanvas == null || meterGamePrefab == null) return;
             var f = InstantiateHud(eng.A.label, eng.MeterA, eng.A.soldierColor);
             var e = InstantiateHud(eng.B.label, eng.MeterB, eng.B.soldierColor);
-            huds[eng] = new EngagementHud { Friendly = f, Enemy = e };
+            huds[eng] = new EngagementHud
+            {
+                Friendly = f,
+                Enemy = e,
+                FriendlyAdvantage = f != null ? CreateAdvantageText(f.transform) : null,
+                EnemyAdvantage    = e != null ? CreateAdvantageText(e.transform) : null,
+            };
         }
 
         MeterGame InstantiateHud(string title, MeterModel model, Color fillColor)
@@ -279,9 +287,38 @@ namespace PikePush.Drill
             return mg;
         }
 
+        // Red advantage caption sitting just under the slider, fed each frame
+        // from EngagementAdvantage. Empty when this side has no edge — so
+        // matching stances on both blocks visually cancel out.
+        Text CreateAdvantageText(Transform parent)
+        {
+            var go = new GameObject("Advantage");
+            go.transform.SetParent(parent, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0f);
+            rt.anchorMax = new Vector2(0.5f, 0f);
+            rt.pivot     = new Vector2(0.5f, 0.5f);
+            // Sits below the slider (which the runner prefab anchors at y≈200).
+            rt.anchoredPosition = new Vector2(0f, 130f);
+            rt.sizeDelta = new Vector2(820f, 30f);
+
+            var txt = go.AddComponent<Text>();
+            txt.font = uiFont;
+            txt.fontSize = 22;
+            txt.fontStyle = FontStyle.Bold;
+            txt.color = new Color(0.95f, 0.45f, 0.45f);
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.text = string.Empty;
+            txt.raycastTarget = false;
+            return txt;
+        }
+
         void DestroyHud(Engagement eng)
         {
             if (!huds.TryGetValue(eng, out var hud)) return;
+            // Advantage texts are children of the MeterGame objects, so
+            // destroying those takes the texts down too. Just null the
+            // dictionary entry.
             if (hud.Friendly != null) Destroy(hud.Friendly.gameObject);
             if (hud.Enemy != null) Destroy(hud.Enemy.gameObject);
             huds.Remove(eng);
@@ -322,10 +359,35 @@ namespace PikePush.Drill
                 ApplyMultipliers(eng.MeterA, eng.A);
                 ApplyMultipliers(eng.MeterB, eng.B);
 
+                UpdateAdvantageTexts(eng);
+
                 bool pushingA = ShouldPush(eng.A);
                 bool pushingB = ShouldPush(eng.B);
                 eng.Tick(dt, pushingA, pushingB);
             }
+        }
+
+        void UpdateAdvantageTexts(Engagement eng)
+        {
+            if (!huds.TryGetValue(eng, out var hud)) return;
+
+            var (advA, advB) = EngagementAdvantage.Compute(
+                eng.A.Posture, eng.A.Spacing, AttackType.PikePush,
+                eng.B.Posture, eng.B.Spacing, AttackType.PikePush);
+
+            ApplyAdvantage(hud.FriendlyAdvantage, advA);
+            ApplyAdvantage(hud.EnemyAdvantage,    advB);
+        }
+
+        static void ApplyAdvantage(Text txt, EngagementAdvantage.Side side)
+        {
+            if (txt == null) return;
+            if (!side.HasAdvantage) { txt.text = string.Empty; return; }
+
+            string push = side.PushDelta > 0.5f ? $"Push +{Mathf.RoundToInt(side.PushDelta)}%" : null;
+            string hold = side.HoldDelta > 0.5f ? $"Hold +{Mathf.RoundToInt(side.HoldDelta)}%" : null;
+            if (push != null && hold != null) txt.text = $"{push}   ·   {hold}";
+            else                              txt.text = push ?? hold;
         }
 
         // Both sides of a drill-mode engagement are pike blocks; the attacker
