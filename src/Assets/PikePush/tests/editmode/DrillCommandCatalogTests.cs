@@ -125,5 +125,63 @@ namespace PikePush.Tests.Drill
             Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.FaceToFrontAndRear));
             Assert.IsFalse(DrillCommandCatalog.IsImplemented(DrillCommand.FaceToBothFlanks));
         }
+
+        // --- HotKey + GroupHotKey collision guards ----------------------
+
+        [Test]
+        public void TopLevelCommandHotKeys_AreUnique()
+        {
+            var seen = new System.Collections.Generic.HashSet<UnityEngine.KeyCode>();
+            foreach (var cmd in DrillCommandCatalog.TopLevelCommands)
+            {
+                var key = DrillCommandCatalog.HotKey(cmd);
+                if (key == UnityEngine.KeyCode.None) continue;
+                Assert.IsTrue(seen.Add(key),
+                    $"Top-level command hotkey {key} is bound twice.");
+            }
+        }
+
+        [Test]
+        public void GroupHotKeys_AreUnique()
+        {
+            var seen = new System.Collections.Generic.HashSet<UnityEngine.KeyCode>();
+            foreach (var g in DrillCommandCatalog.TopLevelGroups)
+            {
+                var key = DrillCommandCatalog.GroupHotKey(g);
+                if (key == UnityEngine.KeyCode.None) continue;
+                Assert.IsTrue(seen.Add(key),
+                    $"Group hotkey {key} is bound twice.");
+            }
+        }
+
+        [Test]
+        public void GroupHotKeys_DontCollideWithTopLevelCommands()
+        {
+            // Both fire at the root state — overlap would make a press both
+            // issue a command AND open a submenu.
+            var cmdKeys = new System.Collections.Generic.HashSet<UnityEngine.KeyCode>();
+            foreach (var cmd in DrillCommandCatalog.TopLevelCommands)
+            {
+                var key = DrillCommandCatalog.HotKey(cmd);
+                if (key != UnityEngine.KeyCode.None) cmdKeys.Add(key);
+            }
+            foreach (var g in DrillCommandCatalog.TopLevelGroups)
+            {
+                var key = DrillCommandCatalog.GroupHotKey(g);
+                if (key == UnityEngine.KeyCode.None) continue;
+                Assert.IsFalse(cmdKeys.Contains(key),
+                    $"Group {g} hotkey {key} collides with a top-level command hotkey.");
+            }
+        }
+
+        [Test]
+        public void EveryTopLevelGroup_HasAHotKey()
+        {
+            foreach (var g in DrillCommandCatalog.TopLevelGroups)
+            {
+                Assert.AreNotEqual(UnityEngine.KeyCode.None, DrillCommandCatalog.GroupHotKey(g),
+                    $"Group {g} is on the top-level bar but has no GroupHotKey wired.");
+            }
+        }
     }
 }

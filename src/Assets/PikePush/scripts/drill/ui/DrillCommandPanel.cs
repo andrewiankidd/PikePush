@@ -20,9 +20,11 @@ namespace PikePush.Drill.UI
         DrillCommandGroup? activeGroup;
         bool needsRebuild;
 
-        // Keyboard shortcuts only fire at top-level (no open submenu). The
-        // mapping lives in DrillCommandCatalog.HotKey so the same source
-        // feeds both this listener and the per-button hint label.
+        // Keyboard scheme:
+        //  Top-level → letter shortcuts (DrillCommandCatalog.HotKey + GroupHotKey)
+        //  Submenu   → numeric 1-9 picks the Nth command in the group,
+        //              Esc backs out to top-level.
+        // Same source feeds the listener and the per-button hint label.
 
         public void Initialize(BlockSelector selector, RectTransform buttonContainer, Font buttonFont, DrillToast toast = null)
         {
@@ -51,23 +53,55 @@ namespace PikePush.Drill.UI
                 return;
             }
 
-            // Hotkeys fire only at top-level; in a submenu the player has
-            // committed to that group and the buttons are the navigation surface.
-            if (activeGroup == null)
-            {
-                foreach (var cmd in DrillCommandCatalog.TopLevelCommands)
-                {
-                    var key = DrillCommandCatalog.HotKey(cmd);
-                    if (key != KeyCode.None && Input.GetKeyDown(key))
-                    {
-                        LogHelper.debug($"[DrillCommandPanel] Key {key} → {cmd}");
-                        IssueToAll(cmd);
-                    }
-                }
-            }
+            if (activeGroup == null) HandleTopLevelHotkeys();
+            else                     HandleSubmenuHotkeys(activeGroup.Value);
 
             if (needsRebuild) RebuildButtons();
             RefreshGating();
+        }
+
+        void HandleTopLevelHotkeys()
+        {
+            // Command hotkeys (Halt / Forward March / Reform).
+            foreach (var cmd in DrillCommandCatalog.TopLevelCommands)
+            {
+                var key = DrillCommandCatalog.HotKey(cmd);
+                if (key != KeyCode.None && Input.GetKeyDown(key))
+                {
+                    LogHelper.debug($"[DrillCommandPanel] Key {key} → {cmd}");
+                    IssueToAll(cmd);
+                    return;
+                }
+            }
+            // Group-opener hotkeys (P / D / F / B / I / C / W).
+            foreach (var group in DrillCommandCatalog.TopLevelGroups)
+            {
+                var key = DrillCommandCatalog.GroupHotKey(group);
+                if (key != KeyCode.None && Input.GetKeyDown(key))
+                {
+                    LogHelper.debug($"[DrillCommandPanel] Key {key} → open {group}");
+                    OpenGroup(group);
+                    return;
+                }
+            }
+        }
+
+        void HandleSubmenuHotkeys(DrillCommandGroup group)
+        {
+            // 1..9 picks the Nth command in the group (matching the on-button
+            // hint). Commands past the 9th are mouse-only.
+            var cmds = DrillCommandCatalog.CommandsInGroup(group);
+            int max = Mathf.Min(9, cmds.Length);
+            for (int i = 0; i < max; i++)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+                {
+                    LogHelper.debug($"[DrillCommandPanel] Submenu key {i + 1} → {cmds[i]}");
+                    IssueToAll(cmds[i]);
+                    CollapseToTopLevel();
+                    return;
+                }
+            }
         }
 
         void HandleEscape()
@@ -133,7 +167,7 @@ namespace PikePush.Drill.UI
         void BuildTopLevel()
         {
             foreach (var cmd in DrillCommandCatalog.TopLevelCommands)
-                AddCommandButton(cmd);
+                AddCommandButton(cmd, DrillCommandCatalog.HotKey(cmd));
 
             foreach (var group in DrillCommandCatalog.TopLevelGroups)
                 AddGroupOpener(group);
@@ -141,16 +175,20 @@ namespace PikePush.Drill.UI
 
         void BuildSubmenu(DrillCommandGroup group)
         {
-            backButton = BuildPlainButton(buttonContainer, buttonFont, "◀ Back", CollapseToTopLevel);
+            backButton = BuildNavButton(buttonContainer, buttonFont, "◀ Back", "(Esc)", CollapseToTopLevel);
 
-            foreach (var cmd in DrillCommandCatalog.CommandsInGroup(group))
-                AddCommandButton(cmd);
+            var cmds = DrillCommandCatalog.CommandsInGroup(group);
+            for (int i = 0; i < cmds.Length; i++)
+            {
+                // Numerical hotkey for the first nine entries; nothing for the rest.
+                var key = i < 9 ? (KeyCode)((int)KeyCode.Alpha1 + i) : KeyCode.None;
+                AddCommandButton(cmds[i], key);
+            }
         }
 
-        void AddCommandButton(DrillCommand cmd)
+        void AddCommandButton(DrillCommand cmd, KeyCode hint)
         {
             string label = DrillCommandCatalog.Label(cmd);
-            KeyCode hint = DrillCommandCatalog.HotKey(cmd);
             var btn = DrillCommandButton.Build(buttonContainer, cmd, label, hint,
                 buttonFont, OnCommandButtonPressed);
             commandButtons.Add(btn);
@@ -159,7 +197,9 @@ namespace PikePush.Drill.UI
         void AddGroupOpener(DrillCommandGroup group)
         {
             string label = DrillCommandCatalog.GroupLabel(group) + " ▸";
-            var go = BuildPlainButton(buttonContainer, buttonFont, label, () => OpenGroup(group));
+            KeyCode key = DrillCommandCatalog.GroupHotKey(group);
+            string hint = key == KeyCode.None ? null : $"({key})";
+            var go = BuildNavButton(buttonContainer, buttonFont, label, hint, () => OpenGroup(group));
             groupButtons.Add(go);
         }
 
@@ -217,10 +257,10 @@ namespace PikePush.Drill.UI
             if (activeGroup != null) CollapseToTopLevel();
         }
 
-        // Plain navigation button (Back, group openers). Uses Unity's Button so
-        // disabled visuals come for free if we later gate openers (e.g.
-        // "Postures" while braced is technically always available, so probably not).
-        static GameObject BuildPlainButton(Transform parent, Font font, string label, System.Action onClick)
+        // Navigation button — Back, group openers. Same two-row layout as
+        // DrillCommandButton (label on top, optional hint on bottom) so the
+        // toolbar looks consistent.
+        static GameObject BuildNavButton(Transform parent, Font font, string label, string hint, System.Action onClick)
         {
             var go = new GameObject($"NavButton_{label}");
             go.transform.SetParent(parent, false);
@@ -231,20 +271,40 @@ namespace PikePush.Drill.UI
             var btn = go.AddComponent<UnityEngine.UI.Button>();
             btn.onClick.AddListener(() => onClick?.Invoke());
 
-            var textGo = new GameObject("Label");
-            textGo.transform.SetParent(go.transform, false);
-            var trect = textGo.AddComponent<RectTransform>();
-            trect.anchorMin = Vector2.zero;
-            trect.anchorMax = Vector2.one;
-            trect.offsetMin = Vector2.zero;
-            trect.offsetMax = Vector2.zero;
-            var txt = textGo.AddComponent<UnityEngine.UI.Text>();
-            txt.font = font;
-            txt.alignment = TextAnchor.MiddleCenter;
-            txt.color = Color.white;
-            txt.fontSize = 18;
-            txt.text = label;
-            txt.raycastTarget = false;
+            bool hasHint = !string.IsNullOrEmpty(hint);
+
+            var labelGo = new GameObject("Label");
+            labelGo.transform.SetParent(go.transform, false);
+            var labelRect = labelGo.AddComponent<RectTransform>();
+            labelRect.anchorMin = new Vector2(0f, hasHint ? 0.4f : 0f);
+            labelRect.anchorMax = new Vector2(1f, 1f);
+            labelRect.offsetMin = Vector2.zero;
+            labelRect.offsetMax = Vector2.zero;
+            var labelTxt = labelGo.AddComponent<UnityEngine.UI.Text>();
+            labelTxt.font = font;
+            labelTxt.alignment = TextAnchor.MiddleCenter;
+            labelTxt.color = Color.white;
+            labelTxt.fontSize = 18;
+            labelTxt.text = label;
+            labelTxt.raycastTarget = false;
+
+            if (hasHint)
+            {
+                var hintGo = new GameObject("Hint");
+                hintGo.transform.SetParent(go.transform, false);
+                var hintRect = hintGo.AddComponent<RectTransform>();
+                hintRect.anchorMin = new Vector2(0f, 0f);
+                hintRect.anchorMax = new Vector2(1f, 0.4f);
+                hintRect.offsetMin = Vector2.zero;
+                hintRect.offsetMax = Vector2.zero;
+                var hintTxt = hintGo.AddComponent<UnityEngine.UI.Text>();
+                hintTxt.font = font;
+                hintTxt.alignment = TextAnchor.MiddleCenter;
+                hintTxt.color = new Color(0.75f, 0.75f, 0.75f);
+                hintTxt.fontSize = 14;
+                hintTxt.text = hint;
+                hintTxt.raycastTarget = false;
+            }
 
             return go;
         }

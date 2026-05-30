@@ -93,10 +93,10 @@ namespace PikePush.Drill
             return cmd.ToString();
         }
 
-        // Keyboard shortcut for a command. Drill mode only listens for these
-        // while no submenu is open (top-level state). KeyCode.None means no
-        // shortcut. Period drill commands aren't single-letter mappable
-        // beyond the three top-level ones — the bigger set stays mouse/tap.
+        // Top-level keyboard shortcut for a command. Drill mode only listens
+        // for these while no submenu is open. KeyCode.None means no shortcut
+        // at the top level. Inside a submenu the commands are addressed by
+        // position via numerical keys (see DrillCommandPanel).
         public static UnityEngine.KeyCode HotKey(DrillCommand cmd)
         {
             switch (cmd)
@@ -105,6 +105,25 @@ namespace PikePush.Drill
                 case DrillCommand.ForwardMarch: return UnityEngine.KeyCode.M;
                 case DrillCommand.Reform:       return UnityEngine.KeyCode.R;
                 default:                         return UnityEngine.KeyCode.None;
+            }
+        }
+
+        // Keyboard shortcut for opening a category submenu (top-level only).
+        // Letters chosen to match the menu label where possible; Doublings
+        // takes B (not D — collides with Distancing) and Filing takes I
+        // (not F — collides with Facings).
+        public static UnityEngine.KeyCode GroupHotKey(DrillCommandGroup group)
+        {
+            switch (group)
+            {
+                case DrillCommandGroup.Postures:     return UnityEngine.KeyCode.P;
+                case DrillCommandGroup.Distancing:   return UnityEngine.KeyCode.D;
+                case DrillCommandGroup.Facings:      return UnityEngine.KeyCode.F;
+                case DrillCommandGroup.Doublings:    return UnityEngine.KeyCode.B;
+                case DrillCommandGroup.Filing:       return UnityEngine.KeyCode.I;
+                case DrillCommandGroup.Countermarch: return UnityEngine.KeyCode.C;
+                case DrillCommandGroup.Wheeling:     return UnityEngine.KeyCode.W;
+                default:                             return UnityEngine.KeyCode.None;
             }
         }
 

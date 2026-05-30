@@ -124,11 +124,13 @@ namespace PikePush.Drill.UI
                     : $"Selected: {selectedCount} blocks";
                 body.text =
                     "Pick a command from the bar.\n\n" +
-                    "Hotkeys:\n" +
+                    "Top-level keys:\n" +
                     BuildHotkeyList() +
+                    "\nSubmenu keys:\n" +
+                    BuildGroupHotkeyList() +
+                    "  1–9 inside, Esc back out\n" +
                     "\nShift+Click to add blocks.\n" +
-                    "Esc or click empty ground to\n" +
-                    "clear the selection.";
+                    "Esc / empty click clears.";
             }
             else
             {
@@ -154,6 +156,19 @@ namespace PikePush.Drill.UI
                 var key = DrillCommandCatalog.HotKey(cmd);
                 if (key == KeyCode.None) continue;
                 sb.Append("  ").Append(key).Append(" — ").Append(DrillCommandCatalog.Label(cmd)).Append('\n');
+            }
+            return sb.ToString();
+        }
+
+        // Same idea for the submenu openers — letter → group label.
+        static string BuildGroupHotkeyList()
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var g in DrillCommandCatalog.TopLevelGroups)
+            {
+                var key = DrillCommandCatalog.GroupHotKey(g);
+                if (key == KeyCode.None) continue;
+                sb.Append("  ").Append(key).Append(" — ").Append(DrillCommandCatalog.GroupLabel(g)).Append('\n');
             }
             return sb.ToString();
         }
