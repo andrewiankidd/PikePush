@@ -17,6 +17,8 @@ namespace PikePush.Drill
         const float FriendlyZ = -10f;
         const float EnemyZ = 10f;
         const float MinContactRadius = 5f;
+        // Block centroid halts this many units short of the visual field edge.
+        const float FieldEdgeMargin = 5f;
 
         // HUD stacking constants.
         const float HudPerSideHeight = 180f;   // each MeterGame strip on screen
@@ -153,6 +155,7 @@ namespace PikePush.Drill
             block.soldierPrefab = soldierPrefab;
             block.soldierColor = palette[index % palette.Length];
             block.faction = faction;
+            block.fieldHalfExtent = (fieldSize * 0.5f) - FieldEdgeMargin;
 
             roster.Add(block);
             RecenterRoster(roster, z);

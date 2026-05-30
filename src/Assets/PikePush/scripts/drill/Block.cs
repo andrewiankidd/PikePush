@@ -28,6 +28,12 @@ namespace PikePush.Drill
         [SerializeField] public Faction faction = Faction.Friendly;
         public Faction Faction => faction;
 
+        [Header("Field")]
+        // X/Z half-extent of the playable field, set by the spawner. A
+        // marching block whose next centroid position would exceed this on
+        // either axis halts itself. 999 = effectively unbounded if unset.
+        [SerializeField] public float fieldHalfExtent = 999f;
+
         public bool IsMarching { get; private set; }
         public PikePosture Posture { get; private set; } = PikePosture.Order;
         public SpacingOrder Spacing { get; private set; } = SpacingOrder.Order;
@@ -85,7 +91,21 @@ namespace PikePush.Drill
             StepYaw();
 
             if (IsMarching)
-                transform.position += transform.forward * marchSpeed * Time.deltaTime;
+            {
+                Vector3 next = transform.position + transform.forward * marchSpeed * Time.deltaTime;
+                if (FieldBounds.IsOutside(next, fieldHalfExtent))
+                {
+                    // At the edge — halt cleanly. Player has to rotate the
+                    // block back toward the field and re-issue Forward March.
+                    IsMarching = false;
+                    IsWheeling = false;
+                    LogHelper.debug($"[Block:{label}] Halted at field boundary");
+                }
+                else
+                {
+                    transform.position = next;
+                }
+            }
 
             CurrentSpacingMultiplier = Mathf.Lerp(
                 CurrentSpacingMultiplier, targetSpacingMultiplier, Time.deltaTime * spacingLerpRate);
