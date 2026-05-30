@@ -59,6 +59,7 @@ namespace PikePush.Drill
         BlockCountPanel friendlyPanel;
         BlockCountPanel enemyPanel;
         DrillToast toast;
+        DrillContextHelp contextHelp;
         Canvas hudCanvas;
         Font uiFont;
         GameObject meterGamePrefab;
@@ -107,6 +108,8 @@ namespace PikePush.Drill
                 new Vector2(-20f, -86f),
                 () => enemy.Count, SpawnEnemy, RemoveLastEnemy,
                 0, MaxBlocksPerFaction);
+
+            contextHelp = DrillContextHelp.Build(hudCanvas.transform, uiFont, selector, engagements);
 
             int nF = Mathf.Clamp(initialFriendlyBlockCount, MinFriendlyBlocks, MaxBlocksPerFaction);
             for (int i = 0; i < nF; i++) SpawnFriendly();
