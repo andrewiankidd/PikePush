@@ -27,6 +27,11 @@ This wiki is for **players who want to know what the buttons do**, **modders who
 
 - [Credits](#credits) — third-party assets, fonts, licenses.
 
+### Glossary
+
+- [Period Terms](#glossary-terms) — vocabulary used across the game: kit, ranks, formation structure, currencies, mechanics.
+- [Drill Commands](#glossary-drill-commands) — the pike drill manual: every command, how to perform it, when it's used.
+
 ## At a glance
 
 | Thing | Value |
