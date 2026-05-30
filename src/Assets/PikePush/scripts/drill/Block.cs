@@ -37,6 +37,8 @@ namespace PikePush.Drill
         // true, AllowsCommand locks out movement and facings — you can only
         // change posture or spacing, halt, or reform.
         public bool IsEngaged { get; set; }
+        // Toggled by BlockSelector to drive the on-ground highlight ring.
+        public bool IsSelected { get; set; }
 
         public float GoalYawDegrees { get; private set; }
         public float CurrentYawDegrees { get; private set; }
@@ -57,6 +59,7 @@ namespace PikePush.Drill
 
         readonly List<Soldier> members = new List<Soldier>();
         BoxCollider selectionCollider;
+        LineRenderer selectionRing;
 
         void Awake()
         {
@@ -71,6 +74,7 @@ namespace PikePush.Drill
         {
             BuildFormation();
             UpdateSelectionCollider();
+            BuildSelectionRing();
         }
 
         void Update()
@@ -89,6 +93,41 @@ namespace PikePush.Drill
             var s = transform.localScale;
             s.y = Mathf.Lerp(s.y, targetYScale, Time.deltaTime * 4f);
             transform.localScale = s;
+
+            if (selectionRing != null) selectionRing.enabled = IsSelected;
+        }
+
+        // A thin coloured rectangle on the ground around the block — the
+        // selection cue BlockSelector flips on/off via IsSelected. Sits
+        // slightly above y=0 so it doesn't z-fight with the field plane.
+        void BuildSelectionRing()
+        {
+            var go = new GameObject("SelectionRing");
+            go.transform.SetParent(transform, false);
+
+            var width = files * baseFileSpacing + 1.4f;
+            var depth = ranks * baseRankSpacing + 1.4f;
+            var hx = width * 0.5f;
+            var hz = depth * 0.5f;
+            const float y = 0.05f;
+
+            selectionRing = go.AddComponent<LineRenderer>();
+            selectionRing.useWorldSpace = false;
+            selectionRing.loop = true;
+            selectionRing.positionCount = 4;
+            selectionRing.SetPosition(0, new Vector3(-hx, y, -hz));
+            selectionRing.SetPosition(1, new Vector3( hx, y, -hz));
+            selectionRing.SetPosition(2, new Vector3( hx, y,  hz));
+            selectionRing.SetPosition(3, new Vector3(-hx, y,  hz));
+            selectionRing.startWidth = 0.18f;
+            selectionRing.endWidth = 0.18f;
+            selectionRing.material = new Material(Shader.Find("Sprites/Default"));
+            // Brighten the block's own colour so the ring reads against the field
+            // but still tracks the faction theming.
+            var c = Color.Lerp(soldierColor, Color.white, 0.4f);
+            selectionRing.startColor = c;
+            selectionRing.endColor = c;
+            selectionRing.enabled = false;
         }
 
         void StepYaw()

@@ -53,44 +53,61 @@ namespace PikePush.Drill
 
         public void Notify()
         {
+            SyncSelectionFlags();
             SelectionChanged?.Invoke(selected);
         }
 
         public void Clear()
         {
             if (selected.Count == 0) return;
+            foreach (var b in selected) if (b != null) b.IsSelected = false;
             selected.Clear();
             LogHelper.debug("[BlockSelector] Cleared selection");
-            Notify();
+            SelectionChanged?.Invoke(selected);
         }
 
         public void Remove(Block block)
         {
             if (block == null) return;
-            if (selected.Remove(block)) Notify();
+            if (selected.Remove(block))
+            {
+                block.IsSelected = false;
+                SelectionChanged?.Invoke(selected);
+            }
         }
 
         void SelectExclusive(Block block)
         {
             if (selected.Count == 1 && ReferenceEquals(selected[0], block)) return;
+            foreach (var b in selected) if (b != null) b.IsSelected = false;
             selected.Clear();
             selected.Add(block);
+            block.IsSelected = true;
             LogHelper.debug($"[BlockSelector] Selected: {block.label}");
-            Notify();
+            SelectionChanged?.Invoke(selected);
         }
 
         void Toggle(Block block)
         {
             if (selected.Remove(block))
             {
+                block.IsSelected = false;
                 LogHelper.debug($"[BlockSelector] Deselected: {block.label}");
             }
             else
             {
                 selected.Add(block);
+                block.IsSelected = true;
                 LogHelper.debug($"[BlockSelector] Added: {block.label}");
             }
-            Notify();
+            SelectionChanged?.Invoke(selected);
+        }
+
+        // Defensive — keep IsSelected flags coherent if external code mutated
+        // the list directly (currently nobody does, but cheap safety).
+        void SyncSelectionFlags()
+        {
+            foreach (var b in selected) if (b != null) b.IsSelected = true;
         }
 
         static bool PointerOverUI()

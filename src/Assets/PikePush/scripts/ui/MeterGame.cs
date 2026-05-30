@@ -57,6 +57,21 @@ namespace PikePush.UI {
             if (titleText != null) titleText.text = title;
         }
 
+        // Tint the slider fill so two stacked meters in a drill engagement
+        // read as their respective blocks (blue friendly vs red enemy etc).
+        // Handles both the directly-wired meterFill (when one is set on the
+        // prefab) and the inner Image on the Slider's fillRect (the runner
+        // prefab uses a Slider, not a raw fill Image).
+        public void SetFillColor(Color color)
+        {
+            if (meterFill != null) meterFill.color = color;
+            if (meterSlider != null && meterSlider.fillRect != null)
+            {
+                var img = meterSlider.fillRect.GetComponent<Image>();
+                if (img != null) img.color = color;
+            }
+        }
+
         public async Task<bool> Show()
         {
             if (IsExternal)

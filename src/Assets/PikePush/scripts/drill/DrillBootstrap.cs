@@ -251,16 +251,17 @@ namespace PikePush.Drill
         // Each engagement gets two MeterGame instances — instantiated from the
         // exact same prefab the runner uses — one bound to each side's meter.
         // Friendly bar on top, enemy beneath. Multiple engagements stack
-        // vertically above the command panel.
+        // vertically above the command panel. Each bar is tinted with its
+        // own block's soldierColor so the two halves read as the right side.
         void SpawnHud(Engagement eng)
         {
             if (hudCanvas == null || meterGamePrefab == null) return;
-            var f = InstantiateHud(eng.A.label, eng.MeterA);
-            var e = InstantiateHud(eng.B.label, eng.MeterB);
+            var f = InstantiateHud(eng.A.label, eng.MeterA, eng.A.soldierColor);
+            var e = InstantiateHud(eng.B.label, eng.MeterB, eng.B.soldierColor);
             huds[eng] = new EngagementHud { Friendly = f, Enemy = e };
         }
 
-        MeterGame InstantiateHud(string title, MeterModel model)
+        MeterGame InstantiateHud(string title, MeterModel model, Color fillColor)
         {
             var go = Object.Instantiate(meterGamePrefab, hudCanvas.transform, false);
             go.name = $"MeterGame_{title}";
@@ -274,6 +275,7 @@ namespace PikePush.Drill
             }
             mg.BindExternal(model);
             mg.SetTitle(title);
+            mg.SetFillColor(fillColor);
             return mg;
         }
 

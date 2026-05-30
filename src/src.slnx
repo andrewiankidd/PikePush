@@ -3,5 +3,6 @@
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="PikePush.Tests.EditMode.csproj" />
   <Project Path="FlexibleColorPicker.csproj" />
+  <Project Path="PikePush.Tests.PlayMode.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>
