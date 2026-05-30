@@ -105,7 +105,8 @@ namespace PikePush.Drill.UI
                     "  · Spacing  (Distancing ▸)\n" +
                     "Closest Order pushes harder\n" +
                     "and drains slower.\n\n" +
-                    "Reform breaks the engagement.";
+                    "Reform breaks the engagement.\n" +
+                    CameraFooter;
             }
             else if (anyEngagement)
             {
@@ -115,7 +116,8 @@ namespace PikePush.Drill.UI
                     "hold SPACE to push on its side.\n\n" +
                     "An engaged block with no input\n" +
                     "drains — keep at least one in\n" +
-                    "your selection while mashing.";
+                    "your selection while mashing.\n" +
+                    CameraFooter;
             }
             else if (selectedCount > 0)
             {
@@ -130,7 +132,8 @@ namespace PikePush.Drill.UI
                     BuildGroupHotkeyList() +
                     "  1–9 inside, Esc back out\n" +
                     "\nShift+Click to add blocks.\n" +
-                    "Esc / empty click clears.";
+                    "Esc / empty click clears.\n" +
+                    CameraFooter;
             }
             else
             {
@@ -140,11 +143,17 @@ namespace PikePush.Drill.UI
                     "Shift+Click to multi-select.\n" +
                     "Esc clears the selection.\n\n" +
                     "Spawn forces with the +/−\n" +
-                    "panels in the top-right.\n\n" +
-                    "Middle mouse to pan camera.\n" +
-                    "Scroll wheel to zoom.";
+                    "panels in the top-right.\n" +
+                    CameraFooter;
             }
         }
+
+        // Camera controls are always available, so appended to every state's
+        // body. Kept as a constant so the wording is consistent.
+        const string CameraFooter =
+            "\nCamera:\n" +
+            "  Middle-mouse drag — pan\n" +
+            "  Scroll wheel      — zoom";
 
         // Pulls every top-level command's hotkey from the catalog so the help
         // panel stays in sync with whatever's actually wired on the buttons.
