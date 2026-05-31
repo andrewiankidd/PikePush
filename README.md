@@ -1,4 +1,7 @@
 # PikePush
+
+![logo](.github/pages/logo.png)
+
 ##### _Started as a dumb lil runner game. Scope crept._
 
 ## About
