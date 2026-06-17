@@ -369,7 +369,7 @@
         document.querySelectorAll("[data-download]").forEach(function(el) {
             var file = el.getAttribute("data-download");
             if (isGitHub) {
-                el.href = "https://github.com/andrewiankidd/PikePush/releases/latest/download/" + file;
+                el.href = "https://github.com/andrewiankidd/PikePush/releases/download/latest-main/" + file;
             } else {
                 el.href = "/downloads/" + file;
             }

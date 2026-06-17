@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using System.Linq;
 using PikePush.Utls;
@@ -53,8 +54,19 @@ namespace PikePush.Controls {
                 }
             }
 
-            // read prefs
+            // Auto-detect platform when no saved preference exists.
             int touchControlsDropdown = Int32.Parse(PlayerPrefs.GetString("TouchControlsDropdown", "0"));
+            if (touchControlsDropdown == 0)
+            {
+                if (Application.platform == RuntimePlatform.Android
+                    || Application.platform == RuntimePlatform.IPhonePlayer
+                    || (Application.platform == RuntimePlatform.WebGLPlayer && IsTouchDevice()))
+                {
+                    touchControlsDropdown = 1; // ButtonControlsSimple
+                    LogHelper.debug("[ControlsManager][Awake] Auto-detected touch platform, defaulting to ButtonControlsSimple");
+                }
+            }
+
             if (touchControlsDropdown > 0)
             {
                 var x = controlSchemes[touchControlsDropdown - 1];
@@ -73,6 +85,21 @@ namespace PikePush.Controls {
                 LogHelper.debug($"[ControlsManager][Awake] activating schema: {scheme}");
                 controlSchemeInstances[scheme].gameObject.SetActive(true);
             }
+        }
+
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        [DllImport("__Internal")]
+        private static extern bool JS_IsTouchDevice();
+#endif
+
+        private static bool IsTouchDevice()
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return JS_IsTouchDevice();
+#else
+            return SystemInfo.deviceType == DeviceType.Handheld;
+#endif
         }
 
         public Controls InputCheck()
