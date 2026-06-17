@@ -26,19 +26,19 @@
     <a href="https://andrewiankidd.github.io/PikePush/WebGL/index.html">
         <img src="https://img.shields.io/badge/%f0%9f%8c%90%20Browser-cadetblue.svg" />
     </a>
-    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/StandaloneLinux64-release.zip">
+    <a href="https://github.com/andrewiankidd/PikePush/releases/download/latest-main/StandaloneLinux64-release.zip">
         <img src="https://img.shields.io/badge/Linux-cadetblue.svg?logo=linux" />
     </a>
-    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/StandaloneWindows64-release.zip">
+    <a href="https://github.com/andrewiankidd/PikePush/releases/download/latest-main/StandaloneWindows64-release.zip">
         <img src="https://img.shields.io/badge/Windows-cadetblue.svg?logo=windows" />
     </a>
-    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/StandaloneOSX-release.zip">
+    <a href="https://github.com/andrewiankidd/PikePush/releases/download/latest-main/StandaloneOSX-release.zip">
         <img src="https://img.shields.io/badge/MacOS-cadetblue.svg?logo=macos" />
     </a>
-    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/Android-release.zip">
+    <a href="https://github.com/andrewiankidd/PikePush/releases/download/latest-main/Android-release.zip">
         <img src="https://img.shields.io/badge/Android-cadetblue.svg?logo=android" />
     </a>
-    <a href="https://github.com/andrewiankidd/PikePush/releases/latest/download/iOS-release.zip">
+    <a href="https://github.com/andrewiankidd/PikePush/releases/download/latest-main/iOS-release.zip">
         <img src="https://img.shields.io/badge/iOS-cadetblue.svg?logo=ios" />
     </a>
     <br>

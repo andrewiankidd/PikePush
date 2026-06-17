@@ -86,7 +86,7 @@ Every push to `master` (or non-`master` with the draft path) produces a tagged G
 - `master` → `release-<yyyy-mm-dd-HH-MM-SS>` (public, not draft).
 - Non-`master` → `<short-sha>-<yyyy-mm-dd-HH-MM-SS>` (draft).
 
-All six platform zips attach as release assets. The website's download buttons resolve to `https://github.com/andrewiankidd/PikePush/releases/latest/download/<asset>` — see the `data-download` rewrite block in [index.html](https://github.com/andrewiankidd/PikePush/blob/master/.github/pages/index.html).
+All six platform zips attach as release assets. The website's download buttons resolve to `https://github.com/andrewiankidd/PikePush/releases/download/latest-main/<asset>` — see the `data-download` rewrite block in [index.html](https://github.com/andrewiankidd/PikePush/blob/master/.github/pages/index.html).
 
 ## Known rough edges
 
